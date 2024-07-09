@@ -25,6 +25,7 @@ const executeQuery = async (query: string, params: any[], res: Response) => {
   try {
     const [results] = await connection.execute(query, params);
     res.json(results);
+    console.log("results:", results);
   } catch (err) {
     console.error("쿼리 실행 중 오류 발생:", err);
     res.status(500).json({ error: "내부 서버 오류" });
@@ -86,16 +87,21 @@ app.get("/api/infoMenu/:storeId", (req: Request, res: Response) => {
   const { storeId } = req.params;
   const query = `
       SELECT 
-        menus.menuName as kitName, 
-        GROUP_CONCAT(menuIngredients.ingredient SEPARATOR ', ') AS kitIngredient, 
-        inventory.quantity as kitCount
-      FROM menus
-      LEFT JOIN menuIngredients ON menus.menuId = menuIngredients.menuId
-      LEFT JOIN inventory ON menus.menuId = inventory.menuId
-      LEFT JOIN storeMenus ON menus.menuId = storeMenus.menuId
-      WHERE storeMenus.storeId = ?
-      GROUP BY menus.menuName, inventory.quantity;
+      menus.menuName as kitName, 
+      menus.ImageUrl,
+      GROUP_CONCAT(DISTINCT menuIngredients.ingredient SEPARATOR ', ') AS kitIngredient, 
+      inventory.quantity as kitCount,
+      GROUP_CONCAT(DISTINCT allergies.ingredientName SEPARATOR ', ') AS kitAllergies
+    FROM menus
+    LEFT JOIN menuIngredients ON menus.menuId = menuIngredients.menuId
+    LEFT JOIN inventory ON menus.menuId = inventory.menuId
+    LEFT JOIN storeMenus ON menus.menuId = storeMenus.menuId
+    LEFT JOIN menuAllergies ON menus.menuId = menuAllergies.menuId
+    LEFT JOIN allergies ON menuAllergies.allergyId = allergies.allergyId
+    WHERE storeMenus.storeId = ?
+    GROUP BY menus.menuName,menus.ImageUrl, inventory.quantity;
   `;
+
   executeQuery(query, [storeId], res);
 });
 

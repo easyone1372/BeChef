@@ -19,9 +19,12 @@ const InfoMenuList = ({ storeId }: InfoMenuListProps) => {
         );
         const data = response.data.map((item: any) => ({
           ...item,
-          kitIngredient: item.kitIngredient.split(", "), // kitIngredient를 문자열 배열로 변환
+          kitIngredient: item.kitIngredient
+            ? item.kitIngredient.split(", ")
+            : [], // kitIngredient가 null이면 빈 배열로 처리
+          kitAllergies: item.kitAllergies ? item.kitAllergies.split(", ") : [], // kitAllergies가 null이면 빈 배열로 처리
         }));
-        console.log(data);
+        console.log("메뉴데이터:", data);
         setInfoMenuList(data);
       } catch (error) {
         console.error("Error fetching menu data", error);
@@ -38,7 +41,9 @@ const InfoMenuList = ({ storeId }: InfoMenuListProps) => {
           key={index}
           kitName={data.kitName}
           kitIngredient={data.kitIngredient}
+          kitAllergies={data.kitAllergies}
           kitCount={data.kitCount}
+          ImageUrl={data.ImageUrl}
         />
       ))}
     </div>

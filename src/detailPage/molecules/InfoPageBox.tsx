@@ -8,7 +8,6 @@ export type InfoPageBoxProps = {
 };
 
 const InfoPageBox = ({ storeId, userId }: InfoPageBoxProps) => {
-  //이코드 이해못함 나중에 다시 천천히 뜯어보기
   const [infoPageData, setInfoPageData] = useState<Omit<
     InfoPageComponentProps,
     "storeId" | "userId"
