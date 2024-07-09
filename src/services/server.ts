@@ -87,22 +87,22 @@ app.get("/api/infoMenu/:storeId", (req: Request, res: Response) => {
   const { storeId } = req.params;
   const query = `
       SELECT 
-      menus.menuName as kitName, 
-      menus.ImageUrl,
-      menus.cookingTime,
-      menus.difficuty,
-      menus.calories,
-      GROUP_CONCAT(DISTINCT menuIngredients.ingredient SEPARATOR ', ') AS kitIngredient, 
-      inventory.quantity as kitCount,
-      GROUP_CONCAT(DISTINCT allergies.ingredientName SEPARATOR ', ') AS kitAllergies,
-    FROM menus
-    LEFT JOIN menuIngredients ON menus.menuId = menuIngredients.menuId
-    LEFT JOIN inventory ON menus.menuId = inventory.menuId
-    LEFT JOIN storeMenus ON menus.menuId = storeMenus.menuId
-    LEFT JOIN menuAllergies ON menus.menuId = menuAllergies.menuId
-    LEFT JOIN allergies ON menuAllergies.allergyId = allergies.allergyId
-    WHERE storeMenus.storeId = ?
-    GROUP BY menus.menuName,menus.ImageUrl, inventory.quantity;
+  menus.menuName as kitName, 
+  menus.imageUrl,
+  menus.cookingTime,
+  menus.difficulty,
+  menus.calories,
+  GROUP_CONCAT(DISTINCT menuIngredients.ingredient SEPARATOR ', ') AS kitIngredient, 
+  inventory.quantity as kitCount,
+  GROUP_CONCAT(DISTINCT allergies.ingredientName SEPARATOR ', ') AS kitAllergies
+FROM menus
+LEFT JOIN menuIngredients ON menus.menuId = menuIngredients.menuId
+LEFT JOIN inventory ON menus.menuId = inventory.menuId
+LEFT JOIN storeMenus ON menus.menuId = storeMenus.menuId
+LEFT JOIN menuAllergies ON menus.menuId = menuAllergies.menuId
+LEFT JOIN allergies ON menuAllergies.allergyId = allergies.allergyId
+WHERE storeMenus.storeId = ?
+GROUP BY menus.menuName, menus.imageUrl, menus.cookingTime, menus.difficulty, menus.calories, inventory.quantity;
   `;
 
   executeQuery(query, [storeId], res);

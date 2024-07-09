@@ -8,7 +8,7 @@ const InfoPage = () => {
   const { storeId } = useParams<{ storeId: string }>();
   const userId = null;
   return (
-    <div>
+    <div className="bg-gray-100">
       <div className="bg-gray-100 w-screen">
         <div className="max-w-800 w-full my-0 mx-auto gap-6 bg-white mb-11">
           <InfoHeader />

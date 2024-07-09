@@ -43,7 +43,10 @@ const InfoMenuList = ({ storeId }: InfoMenuListProps) => {
           kitIngredient={data.kitIngredient}
           kitAllergies={data.kitAllergies}
           kitCount={data.kitCount}
-          ImageUrl={data.ImageUrl}
+          imageUrl={data.imageUrl}
+          cookingTime={data.cookingTime}
+          difficulty={data.difficulty}
+          calories={data.calories}
         />
       ))}
     </div>
