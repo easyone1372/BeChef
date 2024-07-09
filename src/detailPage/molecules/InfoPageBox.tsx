@@ -53,7 +53,7 @@ const InfoPageBox = ({ storeId, userId }: InfoPageBoxProps) => {
   //   </div>
   // );
   return (
-    <div>
+    <div className="drop-shadow-lg bg-white rounded-lg">
       <InfoPageComponent {...infoPageData} storeId={storeId} userId={userId} />
     </div>
   );

@@ -35,7 +35,7 @@ const InfoMenuList = ({ storeId }: InfoMenuListProps) => {
   }, [storeId]);
 
   return (
-    <div>
+    <div className="max-w-768 w-full my-0 mx-auto">
       {infoMenuList.map((data, index: number) => (
         <InfoMenuComponent
           key={index}

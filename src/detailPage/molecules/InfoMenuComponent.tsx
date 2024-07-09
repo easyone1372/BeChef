@@ -20,14 +20,13 @@ const InfoMenuComponent = ({
   ImageUrl,
 }: InfoMenuComponentProps) => {
   return (
-    <div className="flex justify-between items-center text-base h-24 gap-1 border">
+    <div className="flex justify-between items-center text-base h-24 gap-1 w-full">
       <div className="flex gap-1 justify-center items-center">
         <InfoMenuImage content={ImageUrl} />
         <span>{kitName}</span>
       </div>
-
+      {/* 추후 리팩토링해야함 */}
       <div className="flex flex-col gap-1 w-52">
-        {/* 이것도 분리해야함 미친거아님?  */}
         <div className="flex gap-1 pr-1">
           <span>주재료: </span>
           <InfoMenuIngredient content={kitIngredient} />

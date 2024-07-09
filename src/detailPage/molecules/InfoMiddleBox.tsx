@@ -5,9 +5,11 @@ import InfoDayBox, { InfoDayBoxProps } from "./InfoDayBox";
 
 const InfoMiddleBox = ({ storeId }: InfoDayBoxProps) => {
   return (
-    <div className="mt-4 max-w-5xl w-full my-0 mx-auto mb-9">
-      <InfoSubTitle content={"영업시간"} />
-      <InfoDayBox storeId={storeId} />
+    <div className="mt-4 max-w-800 w-full my-0 mx-auto mb-9 drop-shadow-lg bg-white rounded-lg">
+      <div className="max-w-768 w-full my-0 mx-auto pb-1.5">
+        <InfoSubTitle content={"영업시간"} />
+        <InfoDayBox storeId={storeId} />
+      </div>
     </div>
   );
 };

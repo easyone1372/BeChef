@@ -17,9 +17,13 @@ const InfoTitleBox = ({
   userId,
 }: InfoTitleBoxProps) => {
   return (
-    <div className="flex flex-col gap-4 border-x-0 border-t-0 border-b border-solid ">
-      <InfoTitle content={titleContent}></InfoTitle>
-      {userId !== null && <InfoClickHeart storeId={storeId} userId={userId} />}
+    <div className="flex flex-col justify-center items-center gap-4 border-x-0 border-t-0 border-b border-solid ">
+      <div>
+        <InfoTitle content={titleContent}></InfoTitle>
+        {userId !== null && (
+          <InfoClickHeart storeId={storeId} userId={userId} />
+        )}
+      </div>
       <InfoStar starNum={titleStarNum}></InfoStar>
     </div>
   );
