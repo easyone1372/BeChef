@@ -4,7 +4,7 @@ type InfoMenuImageProps = {
 
 const InfoMenuImage = ({ content }: InfoMenuImageProps) => {
   return (
-    <div className="w-px100 h-px100">
+    <div className="w-px100 h-px100 rounded-lg">
       <img className="size-full object-cover" src={`${content}`}></img>
     </div>
   );

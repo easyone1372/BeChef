@@ -3,6 +3,7 @@
 import InfoAllergy from "../atom/InfoAllergy";
 import InfoMenuImage from "../atom/InfoMenuImage";
 import InfoMenuIngredient from "../atom/InfoMenuIngredient";
+import InfoMenuTitle from "../atom/InfoMenuTitle";
 
 export type InfoMenuComponentProps = {
   kitName: string;
@@ -21,9 +22,9 @@ const InfoMenuComponent = ({
 }: InfoMenuComponentProps) => {
   return (
     <div className="flex justify-between items-center text-base h-24 gap-1 w-full">
-      <div className="flex gap-1 justify-center items-center">
+      <div className="flex gap-1 justify-center">
         <InfoMenuImage content={ImageUrl} />
-        <span>{kitName}</span>
+        <InfoMenuTitle content={kitName} />
       </div>
       {/* 추후 리팩토링해야함 */}
       <div className="flex flex-col gap-1 w-52">
