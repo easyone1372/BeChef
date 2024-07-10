@@ -10,10 +10,10 @@ const port = 3001;
 
 // MySQL 연결 설정
 const connection = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "0000",
-  database: "meal_kit_store",
+  host: "koreamorning.mysql.database.azure.com",
+  user: "lovelove4695",
+  password: "dydgus12!@",
+  database: "mealkit",
   timezone: "Z",
   waitForConnections: true,
   connectionLimit: 10,
@@ -36,11 +36,29 @@ const executeQuery = async (query: string, params: any[], res: Response) => {
 app.get("/search", (req: Request, res: Response) => {
   const { query } = req.query;
   const searchQuery = `
-    SELECT s.storeId, s.name AS storeName, s.address, s.latitude, s.longitude, m.menuName AS menuName 
-    FROM stores s 
-    LEFT JOIN menus m ON s.storeId = m.storeId
-    WHERE s.name LIKE ? OR s.address LIKE ? OR m.menuName LIKE ?
+      SELECT 
+      s.storeId, 
+      s.name AS storeName, 
+      s.address, 
+      s.latitude, 
+      s.longitude, 
+      s.rating,  
+      COALESCE(GROUP_CONCAT(DISTINCT m.menuName ORDER BY m.menuName SEPARATOR ', '), '') AS menuName,
+      COALESCE(r.reviewCount, 0) AS reviewCount
+    FROM 
+      stores s 
+    LEFT JOIN 
+      menus m ON s.storeId = m.storeId
+    LEFT JOIN 
+      (SELECT storeId, COUNT(*) AS reviewCount FROM reviews GROUP BY storeId) r ON s.storeId = r.storeId
+    WHERE 
+      s.name LIKE ? 
+      OR s.address LIKE ? 
+      OR m.menuName LIKE ?
+    GROUP BY 
+      s.storeId, s.name, s.address, s.latitude, s.longitude, s.rating, r.reviewCount
   `;
+
   executeQuery(searchQuery, [`%${query}%`, `%${query}%`, `%${query}%`], res);
 });
 

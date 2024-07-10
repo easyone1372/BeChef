@@ -2,18 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import HeaderSection from "../../molecules/HeaderSection/HeaderSection";
 import SearchSection from "../../molecules/SearchSection/SearchSection";
-import SearchResults from "../../atom/SearchResults/SearchResults";
+import SearchResults, { Store } from "../../atom/SearchResults/SearchResults";
 
 // Store 인터페이스 정의
-interface Store {
-  storeId: number;
-  storeName: string;
-  address: string;
-  menuName: string;
-  latitude: number;
-  longitude: number;
-  img: string;
-}
 
 interface SearchProps {
   setResults: React.Dispatch<React.SetStateAction<Store[]>>; // Store[] 타입으로 설정

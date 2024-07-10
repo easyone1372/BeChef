@@ -1,6 +1,5 @@
 //밀키트 메뉴 출력 컴포넌트
 
-import InfoAllergy from "../atom/InfoAllergy";
 import InfoMenuImage from "../atom/InfoMenuImage";
 import InfoMenuIngredient from "../atom/InfoMenuIngredient";
 import InfoMenuText from "../atom/InfoMenuText";
@@ -56,7 +55,7 @@ const InfoMenuComponent = ({
             {kitAllergies && kitAllergies.length > 0 && (
               <div className="flex gap-1 pr-1">
                 <span className="font-semibold">알레르기: </span>
-                <InfoAllergy content={kitAllergies} />
+                <InfoMenuIngredient content={kitAllergies} />
               </div>
             )}
             <div className="flex gap-1 pr-1">
