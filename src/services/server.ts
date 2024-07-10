@@ -110,6 +110,7 @@ app.get("/api/infoMenu/:storeId", (req: Request, res: Response) => {
   menus.cookingTime,
   menus.difficulty,
   menus.calories,
+  menus.description,
   GROUP_CONCAT(DISTINCT menuIngredients.ingredient SEPARATOR ', ') AS kitIngredient, 
   inventory.quantity as kitCount,
   GROUP_CONCAT(DISTINCT allergies.ingredientName SEPARATOR ', ') AS kitAllergies
@@ -120,7 +121,7 @@ LEFT JOIN storeMenus ON menus.menuId = storeMenus.menuId
 LEFT JOIN menuAllergies ON menus.menuId = menuAllergies.menuId
 LEFT JOIN allergies ON menuAllergies.allergyId = allergies.allergyId
 WHERE storeMenus.storeId = ?
-GROUP BY menus.menuName, menus.imageUrl, menus.cookingTime, menus.difficulty, menus.calories, inventory.quantity;
+GROUP BY menus.menuName, menus.imageUrl, menus.description, menus.cookingTime, menus.difficulty, menus.calories, inventory.quantity;
   `;
 
   executeQuery(query, [storeId], res);

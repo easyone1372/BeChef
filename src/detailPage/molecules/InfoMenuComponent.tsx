@@ -14,6 +14,7 @@ export type InfoMenuComponentProps = {
   cookingTime: number;
   difficulty: string;
   calories: number;
+  description: string;
 };
 
 const InfoMenuComponent = ({
@@ -25,30 +26,19 @@ const InfoMenuComponent = ({
   cookingTime,
   difficulty,
   calories,
+  description,
 }: InfoMenuComponentProps) => {
   // 리팩토링 필수!!!!!!!
   return (
-    <div className="flex justify-between items-center text-base h-36 gap-1 w-full">
-      <div className="flex gap-1 justify-center">
+    <div className="flex justify-between items-center text-base gap-1 w-full">
+      <div className="flex gap-px20 justify-center">
         <InfoMenuImage content={imageUrl} />
-        <div className="flex flex-col gap-0.5 ">
+        <div className="flex flex-col gap-1 ">
           <InfoMenuTitle content={kitName} />
-          <div className="flex gap-0.5">
-            <div className="size-fit flex text-xs">
-              <span className="font-semibold">조리시간: </span>
-              <InfoMenuText content={cookingTime} />분
-            </div>
-            <div className="size-fit flex text-xs">
-              <span className="font-semibold">난이도: </span>
-              <InfoMenuText content={difficulty} />
-            </div>
-            <div className="size-fit flex text-xs">
-              <span className="font-semibold">칼로리: </span>
-              <InfoMenuText content={calories} />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 w-52 text-xs">
-            <div className="flex gap-1 pr-1">
+
+          <div className="flex flex-col gap-1">
+            <div className="mb-2.5">{description}</div>
+            <div className="flex gap-1 pr-1 size-fit">
               <span className="font-semibold">주재료: </span>
               <InfoMenuIngredient content={kitIngredient} />
             </div>
@@ -63,9 +53,23 @@ const InfoMenuComponent = ({
               <span>{kitCount}</span>
             </div>
           </div>
+
+          <div className="flex flex-col gap-1 ">
+            <div className="size-fit flex">
+              <span className="font-semibold">조리시간: </span>
+              <InfoMenuText content={cookingTime} />분
+            </div>
+            <div className="size-fit flex ">
+              <span className="font-semibold">난이도: </span>
+              <InfoMenuText content={difficulty} />
+            </div>
+            <div className="size-fit flex">
+              <span className="font-semibold">칼로리: </span>
+              <InfoMenuText content={calories} />
+            </div>
+          </div>
         </div>
       </div>
-      {/* 추후 리팩토링해야함 */}
     </div>
   );
 };

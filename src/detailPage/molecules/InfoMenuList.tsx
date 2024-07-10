@@ -35,7 +35,7 @@ const InfoMenuList = ({ storeId }: InfoMenuListProps) => {
   }, [storeId]);
 
   return (
-    <div className="max-w-768 w-full my-0 mx-auto gap-2.5">
+    <div className="max-w-768 w-full my-0 mx-auto flex flex-col gap-px20">
       {infoMenuList.map((data, index: number) => (
         <InfoMenuComponent
           key={index}
@@ -47,6 +47,7 @@ const InfoMenuList = ({ storeId }: InfoMenuListProps) => {
           cookingTime={data.cookingTime}
           difficulty={data.difficulty}
           calories={data.calories}
+          description={data.description}
         />
       ))}
     </div>

@@ -12,10 +12,17 @@ module.exports = {
       width: {
         custom: "1000px",
         px100: "100px",
+        px200: "200px",
+        px300: "300px",
       },
       height: {
         custom: "900px",
         px100: "100px",
+        px200: "200px",
+        px300: "300px",
+      },
+      gap: {
+        px20: "20px",
       },
     },
   },
