@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import InfoSolidHeart from "../atom/InfoSolidHeart";
-import InfoHeartIcon from "../atom/InfoHeart";
+import InfoHeartIcon from "../atom/InfoHeartIcon";
 
 type InfoClickHeartProps = {
   storeId: number;
-  userId: number;
+  userId: number | null;
 };
 const InfoClickHeart = ({ storeId, userId }: InfoClickHeartProps) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
@@ -22,6 +22,10 @@ const InfoClickHeart = ({ storeId, userId }: InfoClickHeartProps) => {
   }, [storeId, userId]);
 
   const handleHeartClick = () => {
+    if (!userId) {
+      alert("로그인하세요");
+      return;
+    }
     const newFavoritesStatus = !isFavorite;
     axios
       .post(`/api/favorites`, {
@@ -38,7 +42,8 @@ const InfoClickHeart = ({ storeId, userId }: InfoClickHeartProps) => {
   };
 
   return (
-    <div onClick={handleHeartClick}>
+    <div className="text-lg font-bold" onClick={handleHeartClick}>
+      {/* {isFavorite ? <InfoHeartIcon /> : <InfoSolidHeart />} */}
       {isFavorite ? <InfoSolidHeart /> : <InfoHeartIcon />}
     </div>
   );

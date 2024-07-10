@@ -50,7 +50,7 @@ const InfoMenuComponent = ({
             )}
             <div className="flex gap-1 pr-1">
               <span className="font-semibold">남은 수량: </span>
-              <span>{kitCount}</span>
+              <span>{kitCount}</span>개
             </div>
           </div>
 
@@ -66,6 +66,7 @@ const InfoMenuComponent = ({
             <div className="size-fit flex">
               <span className="font-semibold">칼로리: </span>
               <InfoMenuText content={calories} />
+              kcal
             </div>
           </div>
         </div>

@@ -131,7 +131,15 @@ app.get("/api/infoTime/:storeId", (req: Request, res: Response) => {
   const { storeId } = req.params;
   const query = `
     SELECT
-      storeDayOfWeek,
+       CASE storeDayOfWeek
+        WHEN 'Monday' THEN 1
+        WHEN 'Tuesday' THEN 2
+        WHEN 'Wednesday' THEN 3
+        WHEN 'Thursday' THEN 4
+        WHEN 'Friday' THEN 5
+        WHEN 'Saturday' THEN 6
+        WHEN 'Sunday' THEN 7
+      END AS storeDayOfWeek,
       openTime,
       closeTime,
       isClosed

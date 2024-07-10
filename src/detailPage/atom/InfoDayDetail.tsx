@@ -12,8 +12,8 @@ const InfoDayDetail = ({
   isClosed,
 }: InfoDayDetailProps) => {
   return (
-    <div className="flex max-w-768 w-full my-0 mx-auto gap-1 text-sm font-normal justify-between">
-      <div>{dayInfo}</div>
+    <div className="flex max-w-768 w-full my-0 mx-auto gap-px10 text-sm font-normal ">
+      <div className="font-bold">{dayInfo}</div>
       {isClosed ? (
         <span>휴무</span>
       ) : (

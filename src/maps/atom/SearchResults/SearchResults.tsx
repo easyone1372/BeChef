@@ -1,4 +1,5 @@
 import React from "react";
+import InfoClickHeart from "../../../detailPage/molecules/InfoClickHeart";
 
 export type Store = {
   storeId: number;
@@ -33,6 +34,7 @@ const SearchResults = ({ results }: SearchResultsProps) => {
             <div className="flex gap-1 text-sm">
               <span>별점: {result.rating}</span>
               <span>리뷰: {result.reviewCount}</span>
+              {/* <InfoClickHeart storeId={result.storeId} userId={result.userId} /> */}
             </div>
           </li>
         ))}
