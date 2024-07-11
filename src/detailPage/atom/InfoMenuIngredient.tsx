@@ -1,4 +1,4 @@
-type InfoMenuIngredientProps = {
+export type InfoMenuIngredientProps = {
   content: string[];
 };
 const InfoMenuIngredient = ({ content }: InfoMenuIngredientProps) => {

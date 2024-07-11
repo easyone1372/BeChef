@@ -28,7 +28,9 @@ const SearchResults = ({ results }: SearchResultsProps) => {
       <ul className="mt-4">
         {results.map((result, index) => (
           <li key={index} className="border p-2 mb-2">
-            <div>사진: {result.img}</div>
+            <div>
+              사진: <img src={`${result.img}`}></img>
+            </div>
             <div>이름: {result.storeName}</div>
             <div>주소: {result.address}</div>
             <div className="flex gap-1 text-sm">

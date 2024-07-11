@@ -2,7 +2,9 @@
 
 import InfoMenuImage from "../atom/InfoMenuImage";
 import InfoMenuIngredient from "../atom/InfoMenuIngredient";
+import InfoMenuIngredientBox from "../atom/InfoMenuIngredientBox";
 import InfoMenuText from "../atom/InfoMenuText";
+import InfoMenuTextBox from "../atom/InfoMenuTextBox";
 import InfoMenuTitle from "../atom/InfoMenuTitle";
 
 export type InfoMenuComponentProps = {
@@ -33,40 +35,43 @@ const InfoMenuComponent = ({
     <div className="flex justify-between items-center text-base gap-1 w-full">
       <div className="flex gap-px20 justify-center">
         <InfoMenuImage content={imageUrl} />
-        <div className="flex flex-col gap-1 ">
+        <div className="flex flex-col gap-px20 ">
           <InfoMenuTitle content={kitName} />
 
-          <div className="flex flex-col gap-1">
-            <div className="mb-2.5">{description}</div>
-            <div className="flex gap-1 pr-1 size-fit">
-              <span className="font-semibold">주재료: </span>
-              <InfoMenuIngredient content={kitIngredient} />
+          <div className="flex flex-col gap-px10">
+            <div className="mb-2.5 text-xl text-gray-700 w-px445">
+              {description}
             </div>
-            {kitAllergies && kitAllergies.length > 0 && (
-              <div className="flex gap-1 pr-1">
-                <span className="font-semibold">알레르기: </span>
-                <InfoMenuIngredient content={kitAllergies} />
-              </div>
-            )}
-            <div className="flex gap-1 pr-1">
-              <span className="font-semibold">남은 수량: </span>
-              <span>{kitCount}</span>개
-            </div>
-          </div>
 
-          <div className="flex flex-col gap-1 ">
-            <div className="size-fit flex">
-              <span className="font-semibold">조리시간: </span>
-              <InfoMenuText content={cookingTime} />분
-            </div>
-            <div className="size-fit flex ">
-              <span className="font-semibold">난이도: </span>
-              <InfoMenuText content={difficulty} />
-            </div>
-            <div className="size-fit flex">
-              <span className="font-semibold">칼로리: </span>
-              <InfoMenuText content={calories} />
-              kcal
+            <div>
+              <InfoMenuIngredientBox
+                menuText="주재료"
+                menuContent={kitIngredient}
+              />
+
+              {kitAllergies && kitAllergies.length > 0 && (
+                <InfoMenuIngredientBox
+                  menuContent={kitAllergies}
+                  menuText="알레르기"
+                />
+              )}
+
+              <InfoMenuTextBox
+                menuDes="조리시간"
+                menuText={cookingTime}
+                menuUnit="분"
+              />
+              <InfoMenuTextBox menuDes="난이도" menuText={difficulty} />
+              <InfoMenuTextBox
+                menuDes="칼로리"
+                menuText={calories}
+                menuUnit="kcal"
+              />
+              <InfoMenuTextBox
+                menuDes="남은수량"
+                menuText={kitCount}
+                menuUnit="개"
+              />
             </div>
           </div>
         </div>
