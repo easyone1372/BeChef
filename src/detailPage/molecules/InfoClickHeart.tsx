@@ -11,14 +11,16 @@ const InfoClickHeart = ({ storeId, userId }: InfoClickHeartProps) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
   useEffect(() => {
-    axios
-      .get(`/api/favorites/${userId}/${storeId}`)
-      .then((response) => {
-        setIsFavorite(response.data.isFavorite);
-      })
-      .catch((error) => {
-        console.error("찜 상태 조회 중 오류 발생:", error);
-      });
+    if (userId !== null) {
+      axios
+        .get(`/api/favorites/${userId}/${storeId}`)
+        .then((response) => {
+          setIsFavorite(response.data.isFavorite);
+        })
+        .catch((error) => {
+          console.error("찜 상태 조회 중 오류 발생:", error);
+        });
+    }
   }, [storeId, userId]);
 
   const handleHeartClick = () => {
@@ -43,7 +45,6 @@ const InfoClickHeart = ({ storeId, userId }: InfoClickHeartProps) => {
 
   return (
     <div className="text-lg font-bold" onClick={handleHeartClick}>
-      {/* {isFavorite ? <InfoHeartIcon /> : <InfoSolidHeart />} */}
       {isFavorite ? <InfoSolidHeart /> : <InfoHeartIcon />}
     </div>
   );

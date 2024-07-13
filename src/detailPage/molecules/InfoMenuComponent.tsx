@@ -42,20 +42,17 @@ const InfoMenuComponent = ({
             <div className="mb-2.5 text-xl text-gray-700 w-px445">
               {description}
             </div>
-
             <div>
               <InfoMenuIngredientBox
                 menuText="주재료"
                 menuContent={kitIngredient}
               />
-
               {kitAllergies && kitAllergies.length > 0 && (
                 <InfoMenuIngredientBox
                   menuContent={kitAllergies}
                   menuText="알레르기"
                 />
               )}
-
               <InfoMenuTextBox
                 menuDes="조리시간"
                 menuText={cookingTime}

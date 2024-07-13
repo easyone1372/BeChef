@@ -17,7 +17,7 @@ const InfoTitleBox = ({
   userId,
 }: InfoTitleBoxProps) => {
   return (
-    <div className="flex flex-col justify-center items-center gap-4 border-x-0 border-t-0 border-b border-solid ">
+    <div className="flex flex-col justify-center items-center gap-2 border-x-0 border-t-0 border-b border-solid ">
       <InfoTitle content={titleContent}></InfoTitle>
       <div className="flex justify-center items-center gap-px10  mb-4">
         <InfoStar starNum={titleStarNum}></InfoStar>

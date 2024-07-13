@@ -9,7 +9,7 @@ const InfoPage = () => {
   const userId = null;
   return (
     <div className="bg-gray-100">
-      <div className="bg-gray-100 w-screen">
+      <div className="bg-disLP w-screen">
         <div className="max-w-800 w-full my-0 mx-auto gap-6 bg-white mb-11">
           <InfoHeader />
           <InfoPageBox storeId={Number(storeId)} userId={userId} />
