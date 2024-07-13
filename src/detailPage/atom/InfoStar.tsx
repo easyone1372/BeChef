@@ -8,8 +8,8 @@ type InfoStarProps = {
 
 const InfoStar = ({ starNum }: InfoStarProps) => {
   return (
-    <div className="text-base flex">
-      <div className="text-disP">
+    <div className="flex">
+      <div className="text-skipLB">
         <FontAwesomeIcon icon={faStar} />
       </div>
       <div className="font-semibold">{starNum}</div>

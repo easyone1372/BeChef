@@ -35,9 +35,9 @@ const Search: React.FC<SearchProps> = ({ setResults }) => {
   };
 
   return (
-    <div className="bg-lightG">
+    <div className="bg-npLG w-px415">
       <HeaderSection /> {/* 헤더 섹션 */}
-      <div className="p-4">
+      <div className="">
         <SearchSection
           query={query}
           setQuery={setQuery}

@@ -17,7 +17,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({
   handleKeyPress,
 }) => {
   return (
-    <div className="p-4 border-b-2">
+    <div className="p-4 border-b-2 bg-skipDB">
       <div className="flex">
         <Input
           value={query}

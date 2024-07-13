@@ -5,7 +5,7 @@ type LogoProps = {
 const Logo = ({ url }: LogoProps) => {
   return (
     <div>
-      <img src={url} alt="sdf" />
+      <img src={`${url}`} alt="sdf" />
     </div>
   );
 };
