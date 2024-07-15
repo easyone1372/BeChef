@@ -53,7 +53,14 @@ const MyMap: React.FC<{ results: Store[] }> = ({ results }) => {
       });
 
       const infowindow = new kakao.maps.InfoWindow({
-        content: `<div style="padding:5px;z-index:1;">${store.storeName}</div>`, // 인포윈도우 내용 설정
+        content: `<div style="padding:5px;z-index:1; display:flex; flex-direction: column; gap:1; ">
+            <div style="font-size:18px; font-weight: 700;">${store.storeName}</div>
+            <div>
+              <span style="font-size:14px;">${store.address}</span><br/>
+              <span href="http://localhost:3000/information/:${store.storeId}" style=
+              font-size:12px;">상세 정보</span>
+            </div>
+        </div>`, // 인포윈도우 내용 설정
       });
 
       // 마커 클릭 이벤트 설정
