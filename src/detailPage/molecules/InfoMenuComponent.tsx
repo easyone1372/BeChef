@@ -35,7 +35,7 @@ const InfoMenuComponent = ({
     <div className="flex justify-between items-center text-base gap-1 w-full">
       <div className="flex gap-px20 justify-center">
         <InfoMenuImage content={imageUrl} />
-        <div className="flex flex-col gap-px20 ">
+        <div className="flex flex-col gap-px20 m-px10">
           <InfoMenuTitle content={kitName} />
 
           <div className="flex flex-col gap-px10">
