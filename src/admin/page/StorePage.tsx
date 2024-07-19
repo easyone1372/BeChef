@@ -16,10 +16,10 @@ const StorePage = () => {
   return (
     <div>
       {stores.map((store) => (
-        <div key={store.storeId}>
-          <p>Store Name: {store.storeName}</p>
-          <p>Address: {store.storeAddress}</p>
-          <p>Phone: {store.storePhone}</p>
+        <div key={store.store_id}>
+          <p>Store Name: {store.store_name}</p>
+          <p>Address: {store.store_address}</p>
+          <p>Phone: {store.store_phone}</p>
         </div>
       ))}
     </div>

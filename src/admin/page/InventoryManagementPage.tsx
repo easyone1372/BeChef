@@ -2,22 +2,28 @@ import React, { useState, useEffect } from "react";
 import KitList from "../organisms/Kit/KitList";
 import Navigation from "../organisms/Navigation/NavigationPage";
 import Sidebar from "../organisms/Sidebar/SidebarPage";
-import { fetchKits, fetchStores } from "../atom/Kit/KitApi";
+import axios from "axios";
 import { Kit } from "../atom/Kit/Kit";
 
 const InventoryManagementPage = () => {
   const [kits, setKits] = useState<Kit[]>([]);
   const [stores, setStores] = useState<
-    { storeId: number; storeName: string }[]
+    { store_id: number; store_name: string }[]
   >([]);
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
 
   useEffect(() => {
     const loadStores = async () => {
-      const fetchedStores = await fetchStores();
-      setStores(fetchedStores);
-      if (fetchedStores.length > 0) {
-        setSelectedStoreId(fetchedStores[0].storeId);
+      try {
+        const response = await axios.get("http://localhost:3001/api/stores");
+        const fetchedStores = response.data;
+        setStores(fetchedStores);
+        if (fetchedStores.length > 0) {
+          setSelectedStoreId(fetchedStores[0].store_id);
+          console.log("store: ", fetchedStores);
+        }
+      } catch (error) {
+        console.error("Error fetching stores:", error);
       }
     };
     loadStores();
@@ -26,21 +32,38 @@ const InventoryManagementPage = () => {
   useEffect(() => {
     const loadKits = async () => {
       if (selectedStoreId) {
-        const fetchedKits = await fetchKits(selectedStoreId);
-        setKits(fetchedKits);
+        try {
+          const response = await axios.get(
+            `http://localhost:3001/api/inventory/${selectedStoreId}`
+          );
+          const fetchedKits: Kit[] = response.data.map((item: any) => ({
+            menu_id: item.menu_id,
+            menu_name: item.menu_name,
+            menu_description: item.menu_description,
+            menu_price: item.menu_price,
+            menu_image_url: item.menu_image_url,
+            quantity: item.quantity,
+            store_id: item.store_id,
+            store_name: item.store_name,
+          }));
+          console.log(fetchedKits);
+          setKits(fetchedKits);
+        } catch (error) {
+          console.error("Error fetching kits:", error);
+        }
       }
     };
     loadKits();
-  }, [selectedStoreId]);
+  }, [selectedStoreId, stores]);
 
   const handleStoreChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedStoreId(Number(event.target.value));
   };
 
   const handleKitUpdate = (updatedKit: Kit) => {
-    setKits(
-      kits.map((kit) =>
-        kit.mealKitId === updatedKit.mealKitId ? updatedKit : kit
+    setKits((prevKits) =>
+      prevKits.map((kit) =>
+        kit.menu_id === updatedKit.menu_id ? updatedKit : kit
       )
     );
   };
@@ -60,8 +83,8 @@ const InventoryManagementPage = () => {
                 className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               >
                 {stores.map((store) => (
-                  <option key={store.storeId} value={store.storeId}>
-                    {store.storeName}
+                  <option key={store.store_id} value={store.store_id}>
+                    {store.store_name}
                   </option>
                 ))}
               </select>

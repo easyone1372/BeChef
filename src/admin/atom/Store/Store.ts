@@ -1,6 +1,6 @@
 export type Store = {
-  storeId: number;
-  storeName: string;
-  storeAddress: string;
-  storePhone: string;
+  store_id: number;
+  store_name: string;
+  store_address: string;
+  store_phone: string;
 };

@@ -4,12 +4,13 @@ import UserTable from "../organisms/User/UserTable";
 import Navigation from "../organisms/Navigation/NavigationPage";
 import Sidebar from "../organisms/Sidebar/SidebarPage";
 
-type User = {
-  userNO: number;
-  userName: string;
-  userID: string;
-  email: string;
-  address: string;
+export type User = {
+  member_idx: number;
+  member_name: string;
+  member_id: string;
+  member_email: string;
+  member_phone: string;
+  member_address: string;
 };
 
 const UserPage = () => {
@@ -30,11 +31,13 @@ const UserPage = () => {
     }
   };
 
-  const handleDelete = async (userNO: number) => {
+  const handleDelete = async (member_idx: number) => {
     if (window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) {
       try {
-        await axios.delete(`http://localhost:3001/api/users/${userNO}`);
-        setUsers(users.filter((user) => user.userNO !== userNO));
+        await axios.delete(`http://localhost:3001/api/users/${member_idx}`);
+        setUsers((prevUsers) =>
+          prevUsers.filter((user) => user.member_idx !== member_idx)
+        );
         alert("사용자가 성공적으로 삭제되었습니다.");
       } catch (error) {
         console.error("Error deleting user:", error);

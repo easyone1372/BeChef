@@ -13,11 +13,11 @@ export const fetchStores = async () => {
 
 // 밀키트를 등록하는 함수
 export const registerMealKit = async (formData: {
-  storeId: number;
-  mealKitName: string;
-  description: string;
-  price: number;
-  imageUrl: string;
+  store_id: number;
+  menu_name: string;
+  menu_description: string;
+  menu_price: number;
+  menu_image_url: string;
   quantity: number;
 }) => {
   try {

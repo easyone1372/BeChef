@@ -1,10 +1,10 @@
 export type Kit = {
-  mealKitId: number; //키트순번
-  mealKitName: string; //키트이름
-  description: string; //키트
-  price: number; //설명
-  imageUrl: string; //이미지 주소
-  quantity: number; // 수량
-  storeId: number; // 가게순번
-  storeName: string; // 가게이름
+  menu_id: number;
+  menu_name: string;
+  menu_description: string;
+  menu_price: number;
+  menu_image_url: string;
+  quantity: number;
+  store_id: number;
+  store_name: string;
 };

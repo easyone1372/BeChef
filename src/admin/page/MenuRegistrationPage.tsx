@@ -1,72 +1,97 @@
 import React, { useState, useEffect } from "react";
-import {
-  fetchStores,
-  registerMealKit,
-} from "../atom/MenuRegistration/registerApi";
+import axios from "axios";
 import Navigation from "../organisms/Navigation/NavigationPage";
 import Sidebar from "../organisms/Sidebar/SidebarPage";
 import MenuRegistrationForm from "../organisms/MenuRegistration/MenuRegistrationForm";
-import axios from "axios";
+
+export type Store = {
+  store_id: number;
+  store_name: string;
+};
+
+type FormData = {
+  store_id: string;
+  menu_name: string;
+  menu_description: string;
+  menu_price: string;
+  menu_image_url: string;
+  menu_cooking_time: string;
+  menu_difficulty: string;
+  menu_calories: string;
+  quantity: string;
+};
 
 const MenuRegistrationPage: React.FC = () => {
-  const [stores, setStores] = useState<
-    { storeId: number; storeName: string }[]
-  >([]);
+  const [stores, setStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const loadStores = async () => {
       try {
-        const fetchedStores = await fetchStores();
-        setStores(fetchedStores);
+        const response = await axios.get("http://localhost:3001/api/stores");
+        setStores(response.data);
       } catch (error) {
         console.error("Error fetching stores:", error);
-        alert("가게 목록을 불러오는 중 오류가 발생했습니다.");
+        setMessage("가게 목록을 불러오는 중 오류가 발생했습니다.");
       }
     };
     loadStores();
   }, []);
 
-  const handleSubmit = async (formData: {
-    storeId: number;
-    mealKitName: string;
-    description: string;
-    price: number;
-    imageUrl: string;
-    quantity: number;
-  }) => {
+  const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
-    try {
-      const response = await registerMealKit(formData);
 
-      if (response) {
-        alert("밀키트가 성공적으로 등록되었습니다.");
-        // 여기에 폼 초기화 또는 다른 후속 작업을 추가할 수 있습니다.
-      }
+    // 데이터 유효성 검사
+    if (
+      !formData.store_id ||
+      !formData.menu_name ||
+      !formData.menu_description ||
+      !formData.menu_price ||
+      !formData.menu_image_url ||
+      !formData.menu_cooking_time ||
+      !formData.menu_difficulty ||
+      !formData.menu_calories ||
+      !formData.quantity
+    ) {
+      setMessage("모든 필드를 입력해주세요.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:3001/api/mealkit", {
+        ...formData,
+        store_id: Number(formData.store_id),
+        menu_price: Number(formData.menu_price),
+        cooking_time: Number(formData.menu_cooking_time),
+        calories: Number(formData.menu_calories),
+        quantity: Number(formData.quantity),
+      });
+      setMessage(response.data.message);
     } catch (error) {
       console.error("Error registering mealkit:", error);
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          // 서버에서 응답을 받았지만 2xx 범위가 아닌 상태 코드가 반환된 경우
-          alert(
-            `밀키트 등록 중 오류가 발생했습니다: ${
-              error.response.data.message || error.message
-            }`
-          );
-        } else if (error.request) {
-          // 요청이 전송되었지만 응답을 받지 못한 경우
-          alert(
-            "서버에서 응답을 받지 못했습니다. 네트워크 연결을 확인해주세요."
-          );
-        } else {
-          // 요청 설정 중에 오류가 발생한 경우
-          alert(`요청 설정 중 오류가 발생했습니다: ${error.message}`);
-        }
+      if (axios.isAxiosError(error) && error.response) {
+        setMessage(
+          `밀키트 등록 중 오류가 발생했습니다: ${
+            error.response.data.details || error.response.data.error
+          }`
+        );
       } else {
-        alert("알 수 없는 오류가 발생했습니다.");
+        setMessage("밀키트 등록 중 오류가 발생했습니다.");
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (menu_id: number) => {
+    try {
+      await axios.delete(`http://localhost:3001/api/mealkit/${menu_id}`);
+      setMessage("밀키트가 성공적으로 삭제되었습니다.");
+    } catch (error) {
+      console.error("Error deleting mealkit:", error);
+      setMessage("밀키트 삭제 중 오류가 발생했습니다.");
     }
   };
 
@@ -82,11 +107,17 @@ const MenuRegistrationPage: React.FC = () => {
                 메뉴 등록
               </h3>
             </div>
+            {message && (
+              <div className="px-4 py-3 bg-green-100 text-green-700">
+                {message}
+              </div>
+            )}
             <div className="border-t border-gray-200">
               <div className="px-4 py-5 sm:p-6">
                 <MenuRegistrationForm
                   stores={stores}
                   onSubmit={handleSubmit}
+                  onDelete={handleDelete}
                   isLoading={isLoading}
                 />
               </div>
