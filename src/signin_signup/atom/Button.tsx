@@ -1,13 +1,17 @@
 import React from "react";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
-}
+type ButtonProps = {
+  onClick: (e: React.FormEvent) => Promise<void>;
+  text: string;
+};
 
-const Button: React.FC<ButtonProps> = ({ children, ...props }) => {
+const Button = ({ text, onClick }: ButtonProps) => {
   return (
-    <button {...props} className="px-4 py-2 bg-blue-500 text-white rounded">
-      {children}
+    <button
+      onClick={onClick}
+      className="px-4 py-2 bg-skipDB text-white rounded mt-2npm"
+    >
+      {text}
     </button>
   );
 };

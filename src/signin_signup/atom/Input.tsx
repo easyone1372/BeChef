@@ -9,7 +9,7 @@ const Input = ({ type, value, onChange, placeholder }: InputProps) => {
   return (
     <div>
       <input
-        className="border-4 w-64 h-14 w-full pl-2 mb-2"
+        className="border-4 border-skipDB w-64 h-14 w-full pl-2 mt-2 mb-2"
         type={type}
         value={value}
         onChange={onChange}
