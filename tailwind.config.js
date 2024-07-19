@@ -11,6 +11,7 @@ module.exports = {
 
       width: {
         custom: "1000px",
+        px50: "50px",
         px75: "75px",
         px100: "100px",
         px150: "150px",
@@ -21,15 +22,21 @@ module.exports = {
         px400: "400px",
         px415: "415px",
         px445: "445px",
+        px655: "655px",
+        px670: "670px",
+        px700: "700px",
       },
       height: {
         custom: "900px",
         px70: "70px",
+        px85: "85px",
         px100: "100px",
+        px120: "120px",
         px200: "200px",
         px250: "250px",
         px300: "300px",
         px350: "350px",
+        px500: "500px",
       },
       gap: {
         px10: "10px",
@@ -49,6 +56,7 @@ module.exports = {
       margin: {
         px10: "10px",
         px20: "20px",
+        px30: "30px",
       },
     },
   },
