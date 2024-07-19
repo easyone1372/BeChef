@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
 
 type MapInfoBtnProps = {
-  storeId: number;
-  userId?: number;
+  store_id: number;
+  user_id?: number;
   content: string | number;
 };
 
-const MapInfoBtn = ({ storeId, userId, content }: MapInfoBtnProps) => {
-  const linkTo = userId
-    ? `/information/${storeId}?userId=${userId}`
-    : `/information/${storeId}`;
+const MapInfoBtn = ({ store_id, user_id, content }: MapInfoBtnProps) => {
+  const linkTo = user_id
+    ? `/information/${store_id}?userId=${user_id}`
+    : `/information/${store_id}`;
 
   return (
     <Link to={linkTo}>

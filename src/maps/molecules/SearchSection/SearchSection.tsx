@@ -18,13 +18,15 @@ const SearchSection: React.FC<SearchSectionProps> = ({
 }) => {
   return (
     <div className="p-4 border-b-2 bg-skipDB">
-      <div className="flex">
+      <div className="flex gap-2">
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyPress={handleKeyPress}
         />
-        <Button text="검색" onClick={handleSearch} />
+        <div className="text-white">
+          <Button text="검색" onClick={handleSearch} />
+        </div>
       </div>
     </div>
   );

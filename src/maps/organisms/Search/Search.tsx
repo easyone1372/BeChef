@@ -3,16 +3,19 @@ import axios from "axios";
 import HeaderSection from "../../molecules/HeaderSection/HeaderSection";
 import SearchSection from "../../molecules/SearchSection/SearchSection";
 import SearchResults, { Store } from "../../atom/SearchResults/SearchResults";
+import SortBtn from "../../molecules/sortBtn/SortBtn";
 
 // Store 인터페이스 정의
 
 interface SearchProps {
   setResults: React.Dispatch<React.SetStateAction<Store[]>>; // Store[] 타입으로 설정
+  onMarkerHover: (storeId: number | null) => void; // 수정: 부모 컴포넌트로부터 전달받는 onMarkerHover 함수
 }
 
-const Search: React.FC<SearchProps> = ({ setResults }) => {
+const Search = ({ setResults, onMarkerHover }: SearchProps) => {
   const [query, setQuery] = useState(""); // 검색어 상태
   const [results, setResultsState] = useState<Store[]>([]); // 검색 결과 상태
+  const [sortOption, setSortOption] = useState<string>("");
 
   // 검색 버튼 클릭 시 호출되는 함수
   const handleSearch = async () => {
@@ -34,8 +37,19 @@ const Search: React.FC<SearchProps> = ({ setResults }) => {
     }
   };
 
+  // 정렬 버튼 클릭시 호출되는 함수
+  const handleSort = (sortOption: string) => {
+    let sortedResults = [...results];
+    if (sortOption === "review") {
+      sortedResults.sort((a, b) => b.reviewCount - a.reviewCount);
+    } else if (sortOption === "rating") {
+      sortedResults.sort((a, b) => b.store_rating - a.store_rating);
+    }
+    setResultsState(sortedResults);
+  };
+
   return (
-    <div className="bg-npLG w-px415">
+    <div className="bg-npLG w-px415 flex flex-col h-full">
       <HeaderSection /> {/* 헤더 섹션 */}
       <div className="">
         <SearchSection
@@ -44,7 +58,9 @@ const Search: React.FC<SearchProps> = ({ setResults }) => {
           handleSearch={handleSearch}
           handleKeyPress={handleKeyPress}
         />
-        <SearchResults results={results} /> {/* 검색 결과 섹션 */}
+        <SortBtn setSortOption={handleSort} />
+        <SearchResults results={results} onMarkerHover={onMarkerHover} />{" "}
+        {/* 검색 결과 섹션 */}
       </div>
     </div>
   );

@@ -3,19 +3,25 @@ import { BiTargetLock } from "react-icons/bi";
 
 // Store 인터페이스 정의
 interface Store {
-  storeId: number;
-  storeName: string;
-  address: string;
-  menuName: string;
-  latitude: number;
-  longitude: number;
+  store_id: number;
+  store_name: string;
+  store_address: string;
+  menu_name: string;
+  store_latitude: number;
+  store_longitude: number;
 }
 
-const MyMap: React.FC<{ results: Store[] }> = ({ results }) => {
+type MyMapProps = {
+  results: Store[];
+  onMarkerHover: (store_id: number | null) => void;
+};
+
+const MyMap = ({ results, onMarkerHover }: MyMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null); // 지도 엘리먼트를 참조
   const [map, setMap] = useState<any>(null); // 지도 객체 상태
   const [markers, setMarkers] = useState<any[]>([]); // 마커 객체 상태
   const [infoWindow, setInfoWindow] = useState<any>(null); // 인포윈도우 객체 상태
+  const [hoveredMarker, setHoveredMarker] = useState<number | null>(null); // hover된 마커의 storeId 상태
 
   // 지도 초기화
   useEffect(() => {
@@ -45,22 +51,31 @@ const MyMap: React.FC<{ results: Store[] }> = ({ results }) => {
 
     // 새로운 마커 추가
     const newMarkers = results.map((store) => {
-      const position = new kakao.maps.LatLng(store.latitude, store.longitude);
+      const position = new kakao.maps.LatLng(
+        store.store_latitude,
+        store.store_longitude
+      );
       const marker = new kakao.maps.Marker({
         map: map,
         position: position,
-        title: store.storeName,
+        title: store.store_name,
       });
 
       const infowindow = new kakao.maps.InfoWindow({
-        content: `<div style="padding:5px;z-index:1; display:flex; flex-direction: column; gap:1; width: 300px">
-            <div style="font-size:18px; font-weight: 700;">${store.storeName}</div>
+        content: `<div style="padding:5px; display:flex; flex-direction: column; gap:1; width:300px">
+            <div style="font-size:18px; font-weight: 700;">${store.store_name}</div>
             <div>
-              <span style="font-size:14px;">${store.address}</span><br/>
-              <span href="http://localhost:3000/information/${store.storeId}" style="
-              font-size:12px; color:#00BBCC;">상세 정보</span>
+              <span style="font-size:14px;">${store.store_address}</span><br/>
             </div>
         </div>`, // 인포윈도우 내용 설정
+        zIndex: 10, // z-index 설정
+      });
+
+      // 마커외 맵 클릭시 인포윈도우창 닫히는 이벤트 설정
+      kakao.maps.event.addListener(map, "click", () => {
+        if (infoWindow) {
+          infoWindow.close();
+        }
       });
 
       // 마커 클릭 이벤트 설정
@@ -74,9 +89,19 @@ const MyMap: React.FC<{ results: Store[] }> = ({ results }) => {
 
       return marker;
     });
+    document.addEventListener("click", (event) => {
+      if (
+        event.target &&
+        !(event.target as HTMLElement).closest(".map-marker") &&
+        infoWindow
+      ) {
+        infoWindow.close();
+      }
+    });
 
     setMarkers(newMarkers); // 마커 상태 업데이트
-  }, [results, map, infoWindow]);
+    console.log("Markers set:", newMarkers); // 디버깅용 로그 추가
+  }, [results, map, infoWindow, onMarkerHover]);
 
   // 현재 위치로 이동
   const handleCurrentLocation = () => {
