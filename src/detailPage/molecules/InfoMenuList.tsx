@@ -3,10 +3,10 @@ import InfoMenuComponent, { InfoMenuComponentProps } from "./InfoMenuComponent";
 import axios from "axios";
 
 export type InfoMenuListProps = {
-  storeId: number;
+  store_id: number;
 };
 
-const InfoMenuList = ({ storeId }: InfoMenuListProps) => {
+const InfoMenuList = ({ store_id }: InfoMenuListProps) => {
   const [infoMenuList, setInfoMenuList] = useState<InfoMenuComponentProps[]>(
     []
   );
@@ -15,7 +15,7 @@ const InfoMenuList = ({ storeId }: InfoMenuListProps) => {
     const fetchMenu = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/infoMenu/${storeId}`
+          `http://localhost:3001/api/info_menu/${store_id}`
         );
         const data = response.data.map((item: any) => ({
           ...item,
@@ -32,7 +32,7 @@ const InfoMenuList = ({ storeId }: InfoMenuListProps) => {
     };
 
     fetchMenu();
-  }, [storeId]);
+  }, [store_id]);
 
   return (
     <div className="max-w-768 w-full my-0 mx-auto flex flex-col gap-px20">

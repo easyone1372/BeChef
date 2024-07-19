@@ -3,14 +3,14 @@ import InfoPageComponent, { InfoPageComponentProps } from "./InfoPageComponent";
 import axios from "axios";
 
 export type InfoPageBoxProps = {
-  storeId: number;
-  userId: number | null;
+  store_id: number;
+  member_idx: number | null;
 };
 
-const InfoPageBox = ({ storeId, userId }: InfoPageBoxProps) => {
+const InfoPageBox = ({ store_id, member_idx }: InfoPageBoxProps) => {
   const [infoPageData, setInfoPageData] = useState<Omit<
     InfoPageComponentProps,
-    "storeId" | "userId"
+    "store_id" | "member_idx"
   > | null>(null);
 
   useEffect(() => {
@@ -21,11 +21,11 @@ const InfoPageBox = ({ storeId, userId }: InfoPageBoxProps) => {
         //   `http://localhost:3000/api/infoPage/${storeId}`
         // );
         const response = await axios.get<
-          Omit<InfoPageComponentProps, "storeId" | "userId">
-        >(`http://localhost:3001/api/infoPage/${storeId}`);
+          Omit<InfoPageComponentProps, "store_id" | "member_idx">
+        >(`http://localhost:3001/api/info_page/${store_id}`);
 
         const data = response.data;
-        console.log(data);
+        console.log("infopagebox에서 가져온 데이터", data);
 
         setInfoPageData(data);
       } catch (error) {
@@ -34,13 +34,13 @@ const InfoPageBox = ({ storeId, userId }: InfoPageBoxProps) => {
     };
 
     fetchData();
-  }, [storeId]);
+  }, [store_id]);
 
   // infoPageData가 없으면 로딩 또는 에러 메시지를 보여줍니다.
   if (!infoPageData) {
     return <div>Loading...</div>;
   }
-  console.log("infoPageData:", infoPageData);
+  // console.log("infoPageData:", infoPageData);
   // return (
   //   <div>
   //     <InfoPageComponent
@@ -54,7 +54,11 @@ const InfoPageBox = ({ storeId, userId }: InfoPageBoxProps) => {
   // );
   return (
     <div className="drop-shadow-lg bg-white rounded-lg">
-      <InfoPageComponent {...infoPageData} storeId={storeId} userId={userId} />
+      <InfoPageComponent
+        {...infoPageData}
+        store_id={store_id}
+        member_idx={member_idx}
+      />
     </div>
   );
 };

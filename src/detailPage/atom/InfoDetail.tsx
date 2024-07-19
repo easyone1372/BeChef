@@ -11,7 +11,7 @@ type InfoDetailProps = {
 const InfoDetail = ({ content, detailIcon }: InfoDetailProps) => {
   return (
     <div className="flex gap-2">
-      <div>
+      <div className="pl-2">
         <FontAwesomeIcon icon={detailIcon} />
       </div>
       <div className="text-sm font-thin">{content}</div>

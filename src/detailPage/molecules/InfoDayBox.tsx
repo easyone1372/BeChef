@@ -6,16 +6,16 @@ import InfoDayDetail, { InfoDayDetailProps } from "../atom/InfoDayDetail";
 import { InfoWeek } from "../atom/InfoWeek";
 
 export type InfoDayBoxProps = {
-  storeId: number;
+  store_id: number;
 };
-const InfoDayBox = ({ storeId }: InfoDayBoxProps) => {
+const InfoDayBox = ({ store_id }: InfoDayBoxProps) => {
   const [dayDetail, setDayDetail] = useState<InfoDayDetailProps[]>([]);
 
   useEffect(() => {
     const fetchDays = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/infoTime/${storeId}`
+          `http://localhost:3001/api/info_time/${store_id}`
         );
         const data = response.data;
         const formatTime = (time: string) => {
@@ -33,14 +33,14 @@ const InfoDayBox = ({ storeId }: InfoDayBoxProps) => {
           };
         });
 
-        console.log(mappedData);
+        console.log("dayData:", mappedData);
         setDayDetail(mappedData);
       } catch (error) {
         console.error("영업 시간 정보를 가져오는 중 오류 발생:", error);
       }
     };
     fetchDays();
-  }, [storeId]);
+  }, [store_id]);
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import InfoStar from "../atom/InfoStar";
+import InfoStar from "../atom/InfoSetStar";
 import InfoTitle from "../atom/InfoTitle";
 import InfoClickHeart from "./InfoClickHeart";
 
@@ -6,22 +6,22 @@ import InfoClickHeart from "./InfoClickHeart";
 type InfoTitleBoxProps = {
   titleContent: string;
   titleStarNum: number;
-  storeId: number;
-  userId: number | null;
+  store_id: number;
+  member_idx: number | null;
 };
 
 const InfoTitleBox = ({
   titleContent,
   titleStarNum,
-  storeId,
-  userId,
+  store_id,
+  member_idx,
 }: InfoTitleBoxProps) => {
   return (
     <div className="flex flex-col justify-center items-center gap-2 border-x-0 border-t-0 border-b border-solid ">
       <InfoTitle content={titleContent}></InfoTitle>
       <div className="flex justify-center items-center gap-px10  mb-4">
         <InfoStar starNum={titleStarNum}></InfoStar>
-        <InfoClickHeart storeId={storeId} userId={userId} />
+        <InfoClickHeart store_id={store_id} member_idx={member_idx} />
       </div>
     </div>
   );

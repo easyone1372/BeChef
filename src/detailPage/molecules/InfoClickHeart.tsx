@@ -4,43 +4,46 @@ import InfoSolidHeart from "../atom/InfoSolidHeart";
 import InfoHeartIcon from "../atom/InfoHeartIcon";
 
 type InfoClickHeartProps = {
-  storeId: number;
-  userId: number | null;
+  store_id: number;
+  member_idx: number | null;
 };
-const InfoClickHeart = ({ storeId, userId }: InfoClickHeartProps) => {
+const InfoClickHeart = ({ store_id, member_idx }: InfoClickHeartProps) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
   useEffect(() => {
-    if (userId !== null) {
-      axios
-        .get(`/api/favorites/${userId}/${storeId}`)
-        .then((response) => {
-          setIsFavorite(response.data.isFavorite);
-        })
-        .catch((error) => {
+    const fetchHeart = async () => {
+      if (member_idx !== null) {
+        try {
+          const response = await axios.get(
+            `http://localhost:3001/api/favorites/${store_id}/${member_idx}`
+          );
+          const data = response.data;
+          setIsFavorite(data.is_favorite);
+        } catch (error) {
           console.error("찜 상태 조회 중 오류 발생:", error);
-        });
-    }
-  }, [storeId, userId]);
+        }
+      }
+    };
+    fetchHeart();
+  }, [store_id, member_idx]);
 
-  const handleHeartClick = () => {
-    if (!userId) {
+  const handleHeartClick = async () => {
+    if (member_idx === null) {
       alert("로그인하세요");
       return;
     }
+
     const newFavoritesStatus = !isFavorite;
-    axios
-      .post(`/api/favorites`, {
-        userId,
-        storeId,
-        isFavorite: newFavoritesStatus,
-      })
-      .then(() => {
-        setIsFavorite(newFavoritesStatus);
-      })
-      .catch((error) => {
-        console.error("찜 상태 업데이트 중 오류 발생:", error);
+    try {
+      await axios.post(`http://localhost:3001/api/favorites`, {
+        member_idx,
+        store_id,
+        is_favorite: newFavoritesStatus,
       });
+      setIsFavorite(newFavoritesStatus);
+    } catch (error) {
+      console.error("찜 상태 업데이트 중 오류 발생:", error);
+    }
   };
 
   return (
