@@ -272,10 +272,11 @@ app.get(
 
     query = `
       SELECT 
+        reviews.review_id,
         reviews.store_id,
         reviews.member_idx,
-        reviews.review_rating AS userRating,
-        reviews.comment AS userReview,
+        reviews.review_rating,
+        reviews.comment,
         reviews.review_date AS reviewDate,
         member.member_name AS userName
       FROM reviews
@@ -345,15 +346,40 @@ app.post("/api/review_input", async (req, res) => {
   }
 });
 
+app.put(
+  "/api/review_update/:review_id",
+  async (req: Request, res: Response) => {
+    const review_id = parseInt(req.params.review_id, 10);
+    const { comment, review_rating } = req.body;
+
+    if (comment == null || review_rating == null) {
+      return res.status(400).json({ error: "댓글을 입력하세요." });
+    }
+    try {
+      const query = `
+      UPDATE reviews 
+      SET comment = ?, review_rating = ?
+      WHERE review_id = ?
+      `;
+      await connection.execute(query, [comment, review_rating, review_id]);
+      res.json("리뷰 수정 완료");
+    } catch (error) {
+      console.error("리뷰 수정 중 오류 발생: ", error);
+      res.status(500).json({ error: "리뷰 수정 중 오류 발생" });
+    }
+  }
+);
+
 // 상세 페이지 - 리뷰 삭제
 app.delete(
   "/api/review_delete/:review_id",
   async (req: Request, res: Response) => {
     const { review_id } = req.params;
     try {
-      const deleteReviews = `delete from reviews where review_id = ${review_id}`;
-      await connection.query(deleteReviews);
+      const query = `DELETE FROM reviews WHERE review_id = ?`;
+      await connection.execute(query, [review_id]);
       console.log("리뷰 삭제됨");
+      res.status(200).json({ message: "리뷰 삭제 완료" });
     } catch (error) {
       console.error("리뷰 삭제 중 오류 발생: ", error);
       res.status(500).json({ error: "리뷰 삭제 중 오류 발생" });
