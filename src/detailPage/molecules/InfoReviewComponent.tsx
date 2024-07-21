@@ -7,25 +7,27 @@ import InfoStar from "../atom/InfoSetStar";
 //상세페이지 - 리뷰출력 컴포컨트 구성
 export type InfoReviewComponentProps = {
   userName: string;
-  userReview: string;
-  userRating: number;
+  comment: string;
+  review_rating: number;
   reviewDate: string;
   member_idx?: number;
+  review_id: number;
 };
 const InfoReviewComponent = ({
   userName,
-  userReview,
-  userRating,
+  comment,
+  review_rating,
   reviewDate,
+  review_id,
 }: InfoReviewComponentProps) => {
   return (
-    <div className="flex flex-col gap-1 ">
+    <div className="flex flex-col gap-1" key={review_id}>
       <div className="text-bold">{userName}</div>
       <div className="flex gap-1">
-        <InfoStar starNum={userRating} />
+        <InfoStar starNum={review_rating} />
         <span>{reviewDate}</span>
       </div>
-      <InfoMenuText content={userReview} />
+      <InfoMenuText content={comment} />
     </div>
   );
 };

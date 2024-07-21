@@ -23,7 +23,7 @@ const InfoReviewInputBox = ({
   const [comment, setComment] = useState("");
   const [reviewRating, setReviewRating] = useState<number>(0); // 리뷰 평점을 추가로 설정해야 함
   const [reviewSubmitted, setReviewSubmitted] = useState<boolean>(false); // 리뷰 제출 상태 추가
-  const [resetInput, setResetInput] = useState<boolean>(false); // 새로운 state 추가
+  const [resetInput, setResetInput] = useState<boolean>(false);
 
   const handleSubmit = async () => {
     if (!member_idx) {
@@ -69,7 +69,7 @@ const InfoReviewInputBox = ({
         const url = `http://localhost:3001/api/info_review/${store_id}`;
         const response = await axios.get(url);
         const data: InfoReviewComponentProps[] = response.data;
-        console.log("리뷰 데이터: ", data);
+        console.log("다시 가져온 리뷰 데이터: ", data);
         setInfoReviewList(data);
       } catch (error) {
         console.error("리뷰 정보를 가져오는 중 오류 발생: ", error);
@@ -80,13 +80,15 @@ const InfoReviewInputBox = ({
       fetchReview();
       setReviewSubmitted(false);
     }
-  }, [reviewSubmitted, store_id]);
+  }, [reviewSubmitted, store_id, setInfoReviewList]);
 
+  //나중에 리팩토링 가능할거같음
   return (
     <div>
       <InfoReviewStarComponent
         totalStars={5}
         setReviewRating={setReviewRating}
+        initialRating={reviewRating}
         reset={reviewSubmitted}
       />
       <div className="flex gap-px10 justify-center items-center hover:cursor-pointer">

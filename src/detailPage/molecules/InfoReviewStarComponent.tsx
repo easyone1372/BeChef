@@ -5,22 +5,27 @@ import InfoStarIcon from "../atom/InfoStarIcon";
 type InfoReviewStarComponentProps = {
   totalStars: number;
   setReviewRating: React.Dispatch<React.SetStateAction<number>>;
+  initialRating?: number;
   reset: boolean;
 };
 
 const InfoReviewStarComponent: React.FC<InfoReviewStarComponentProps> = ({
   totalStars,
   setReviewRating,
+  initialRating = 0,
   reset,
 }) => {
   const [hover, setHover] = useState<number | null>(null);
-  const [rating, setRating] = useState<number>(0); // 별점 상태 추가
+  const [rating, setRating] = useState<number>(initialRating); // 별점 상태 추가
 
   useEffect(() => {
     if (reset) {
       setRating(0);
+      setReviewRating(0);
+    } else {
+      setRating(initialRating); // 초기 별점으로 설정
     }
-  }, [reset]);
+  }, [reset, initialRating, setReviewRating]);
 
   const handleMouseOver = (starIdx: number) => {
     setHover(starIdx);

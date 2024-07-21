@@ -3,7 +3,7 @@ export type InfoMenuIngredientProps = {
 };
 const InfoMenuIngredient = ({ content }: InfoMenuIngredientProps) => {
   return (
-    <div>
+    <div className="w-px360">
       {content.map((ingredient, index) => (
         // <span key={index}>{ingredient}</span>
         <span key={index}>

@@ -38,7 +38,7 @@ const InfoMenuComponent = ({
         <div className="flex flex-col gap-px20 ">
           <InfoMenuTitle content={kitName} />
 
-          <div className="flex flex-col gap-px10">
+          <div className="flex flex-col gap-px10 w-px445">
             <div className="mb-2.5 text-xl text-gray-700 w-px445">
               {description}
             </div>
