@@ -1,14 +1,25 @@
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../atom/Button/Button";
 import Logo from "../../atom/Logo/Logo";
 import DropdownMenu from "../../atom/DropdownMenu/DropdownMenu";
-import { useState } from "react";
 
 const HeaderSection = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt-token");
+    setIsLoggedIn(!!token);
+  }, []);
+
   const navigateLogin = () => {
     navigate("/sign-in");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("jwt-token");
+    setIsLoggedIn(false);
   };
 
   return (
@@ -17,9 +28,14 @@ const HeaderSection = () => {
         <Logo url="logo.png" /> MealKit
       </div>
       <div className="p-3">
-        <DropdownMenu setIsLoggedIn={setIsLoggedIn} />
+        {isLoggedIn ? (
+          <DropdownMenu onLogout={handleLogout} />
+        ) : (
+          <Button onClick={navigateLogin} text="Login" className="" />
+        )}
       </div>
     </div>
   );
 };
+
 export default HeaderSection;

@@ -32,67 +32,7 @@ const executeQuery = async (query: string, params: any[], res: Response) => {
   }
 };
 
-// 로그인 회원가입
-app.post("/api/signup", async (req: Request, res: Response) => {
-  const { name, id, pwd, email, phoneNumber, address } = req.body;
-
-  try {
-    console.log("Received signup request:", {
-      name,
-      id,
-      email,
-      phoneNumber,
-      address,
-    });
-
-    // 아이디 중복 체크
-    const [rows] = await connection.execute(
-      "SELECT COUNT(*) as count FROM member WHERE member_id = ?", //아이디인데 username으로 되어있어서 임의로 user_id로 변경함. 문제 발생시 죄송합니다
-      [id]
-    );
-    const count = (rows as any)[0].count;
-    if (count > 0) {
-      console.log("Username already exists");
-      return res.status(400).json({ error: "아이디가 이미 존재합니다." });
-    }
-
-    // 유저 등록
-    await connection.execute(
-      "INSERT INTO member (member_name, member_id, member_pwd, member_email, member_phone, member_address) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, id, pwd, email, phoneNumber, address]
-    );
-
-    console.log("User registered successfully");
-    res.status(201).json({ message: "회원가입 성공" });
-  } catch (err) {
-    console.error("Error during signup:", err);
-    res.status(500).json({ error: "내부 서버 오류" });
-  }
-});
-
-//로그인
-app.post("/api/login", async (req: Request, res: Response) => {
-  const { id, pwd } = req.body;
-
-  try {
-    const [rows] = await connection.execute(
-      "SELECT * FROM member WHERE member_id = ? AND member_pwd = ?",
-      [id, pwd]
-    );
-
-    if ((rows as any).length > 0) {
-      res.status(200).json({ message: "로그인 성공" });
-    } else {
-      res.status(401).json({ error: "아이디 또는 비밀번호가 잘못되었습니다." });
-    }
-  } catch (err) {
-    console.error("로그인 중 오류 발생:", err);
-    res.status(500).json({ error: "내부 서버 오류" });
-  }
-});
-
-// mapPage에 정보 불러오기 -- 추후 수정
-/*
+//mapPage에 정보 불러오기
 app.get("/search", async (req: Request, res: Response) => {
   const { query } = req.query;
 
@@ -101,41 +41,119 @@ app.get("/search", async (req: Request, res: Response) => {
   }
 
   const searchQuery = `
-      SELECT 
+    SELECT
       s.store_id,
-      s.store_name ,
+      s.store_name,
       s.store_address,
       s.store_latitude,
       s.store_longitude,
       s.store_rating,
-      COALESCE(GROUP_CONCAT(DISTINCT m.menu_name ORDER BY m.menu_name SEPARATOR ', '), '') ,
+      COALESCE(GROUP_CONCAT(DISTINCT m.menu_name ORDER BY m.menu_name SEPARATOR ', '), '') AS menu_names,
       COALESCE(r.reviewCount, 0) AS reviewCount
-    FROM 
-      stores s 
-    LEFT JOIN 
+    FROM
+      stores s
+    LEFT JOIN
       menus m ON s.store_id = m.store_id
-    LEFT JOIN 
+    LEFT JOIN
       (SELECT store_id, COUNT(*) AS reviewCount FROM reviews GROUP BY store_id) r ON s.store_id = r.store_id
-    WHERE 
-      s.store_name LIKE ? 
-      OR s.store_address LIKE ? 
+    WHERE
+      s.store_name LIKE ?
+      OR s.store_address LIKE ?
       OR m.menu_name LIKE ?
-    GROUP BY 
+    GROUP BY
       s.store_id, s.store_name, s.store_address, s.store_latitude, s.store_longitude, s.store_rating, r.reviewCount
   `;
 
   try {
-    const results = await executeQuery(searchQuery, [
-      `%${query}%`,
-      `%${query}%`,
-      `%${query}%`,
-    ]);
-    res.json(results);
+    const results = await executeQuery(
+      searchQuery,
+      [`%${query}%`, `%${query}%`, `%${query}%`],
+      res
+    ); // res를 executeQuery 함수에 전달
   } catch (err) {
-    handleError(err, res);
+    console.error("쿼리 실행 중 오류 발생:", err);
+    res.status(500).json({ error: "내부 서버 오류" });
   }
 });
-*/
+
+// 모달 -> 마이 페이지 -> 리뷰 리스트 가져오기 [+날짜] (로그인 하면 해당 유저꺼로 수정하던가 해야 될듯)
+app.get("/api/reviews", async (req: Request, res: Response) => {
+  const query = `SELECT comment, review_date FROM reviews`;
+  try {
+    const [rows] = await connection.execute<RowDataPacket[]>(query);
+    const formattedRows = rows.map((row) => {
+      if (row.review_date) {
+        const date = new Date(row.review_date);
+        const formattedDate = `${date.getFullYear()}.${(date.getMonth() + 1)
+          .toString()
+          .padStart(2, "0")}.${date
+          .getDate()
+          .toString()
+          .padStart(2, "0")} ${date
+          .getHours()
+          .toString()
+          .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+        row.review_date = formattedDate;
+      }
+      return row;
+    });
+    res.json(formattedRows);
+  } catch (err) {
+    console.error("쿼리 실행 중 오류 발생:", err);
+    res.status(500).json({ error: "내부 서버 오류" });
+  }
+});
+
+// 모달 -> 마이 페이지 -> 찜 리스트 가져오기 (로그인 하면 해당 유저꺼로 수정하던가 해야 될듯)
+app.get("/api/favorites", async (req: Request, res: Response) => {
+  const query =
+    "SELECT store_name FROM favorites JOIN stores ON favorites.store_id = stores.store_id WHERE is_favorite = 1";
+  try {
+    const [rows] = await connection.execute<RowDataPacket[]>(query);
+    const favorites = rows.map((row) => row.store_name);
+    res.json(favorites);
+  } catch (err) {
+    console.error("쿼리 실행 중 오류 발생:", err);
+    res.status(500).json({ error: "내부 서버 오류" });
+  }
+});
+
+// 회원탈퇴기능
+
+app.delete(
+  "/api/delete-account/:memberId",
+  async (req: Request, res: Response) => {
+    const memberId = req.params.memberId;
+
+    try {
+      await connection.beginTransaction();
+
+      // reviews 테이블에서 삭제
+      await connection.execute("DELETE FROM reviews WHERE member_idx = ?", [
+        memberId,
+      ]);
+
+      // favorites 테이블에서 삭제
+      await connection.execute("DELETE FROM favorites WHERE member_idx = ?", [
+        memberId,
+      ]);
+
+      // member 테이블에서 삭제
+      await connection.execute("DELETE FROM member WHERE member_idx = ?", [
+        memberId,
+      ]);
+
+      await connection.commit();
+      res.status(200).send("Account deleted successfully");
+    } catch (error) {
+      await connection.rollback();
+      console.error("Error deleting account:", error);
+      res.status(500).send("Error deleting account");
+    } finally {
+      await connection.end();
+    }
+  }
+);
 
 // 지원님 서버
 
@@ -346,6 +364,7 @@ app.post("/api/review_input", async (req, res) => {
   }
 });
 
+//상세 페이지 - 리뷰 수정
 app.put(
   "/api/review_update/:review_id",
   async (req: Request, res: Response) => {
