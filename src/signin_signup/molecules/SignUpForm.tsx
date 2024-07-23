@@ -12,6 +12,9 @@ import {
   validateaddress,
 } from "./SignUpCheck";
 import FormField from "./FormField";
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
 
 const SignUpForm: React.FC = () => {
   // 각 입력 필드에 대한 상태 관리
@@ -91,6 +94,14 @@ const SignUpForm: React.FC = () => {
     setErrors((prev) => ({ ...prev, address: validateaddress(value) }));
   };
 
+  const navigate = useNavigate();
+  const goToLogin = () => {
+    navigate("/sign-in");
+  };
+  const goMainPage = () => {
+    navigate("/");
+  };
+
   // 회원가입 제출 핸들러
   const handleSignUp = async () => {
     // 모든 필드의 에러 검사
@@ -98,16 +109,20 @@ const SignUpForm: React.FC = () => {
     if (!hasErrors) {
       try {
         // 서버에 회원가입 요청
-        const response = await axios.post("http://localhost:8080/api/signup", {
-          name,
-          id,
-          pwd,
-          email,
-          phone,
-          address,
-        });
+        const response = await axios.post(
+          "http://localhost:8080/bechef/member/register",
+          {
+            name,
+            id,
+            pwd,
+            email,
+            phone,
+            address,
+          }
+        );
         console.log("서버 응답:", response.data);
         alert("가입 성공!");
+        goToLogin();
       } catch (error) {
         if (axios.isAxiosError(error)) {
           console.error("Sign-up error", error.response?.data);
@@ -128,8 +143,15 @@ const SignUpForm: React.FC = () => {
 
   return (
     <div className="min-h-screen  flex items-center justify-center p-4">
-      <div className="bg-npLG p-8 rounded-lg shadow-lg w-px400  w-full">
-        <div className="text-center pb-6">
+      <div className="bg-npLG p-4 rounded-lg shadow-lg w-px415  w-full h-fit">
+        <div className="text-center pb-4">
+          <div className="text-left">
+            <FontAwesomeIcon
+              onClick={goMainPage}
+              className="text-lg text-skipDB cursor-pointer"
+              icon={faHouse}
+            />
+          </div>
           <h1 className="text-3xl font-bold mb-2 text-skipDB">회원가입</h1>
           <p className="text-gray-600">신선한 요리의 시작, 지금 가입하세요</p>
         </div>
