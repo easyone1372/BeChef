@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import IngredientsInput from "../ingredients/IngredientsInput";
+import { Ingredient, ingredients } from "../../atom/ingredients/Ingredients";
 
 // Store 타입 정의
 type Store = {
@@ -16,6 +18,7 @@ type FormData = {
   menu_image_url: string;
   menu_cooking_time: string;
   menu_difficulty: string;
+  menu_ingredients: string;
   menu_calories: string;
   quantity: string;
 };
@@ -43,6 +46,7 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
     menu_image_url: "",
     menu_cooking_time: "",
     menu_difficulty: "",
+    menu_ingredients: "",
     menu_calories: "",
     quantity: "",
   });
@@ -50,60 +54,74 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
   // uploadImgUrl 상태 정의 및 초기화
   const [uploadImgUrl, setUploadImgurl] = useState("");
 
+  //선택한 재료들
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+
   // 입력 변경 시 호출되는 함수
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target; // 입력 요소의 이름과 값을 가져옴
-    setFormData((prev) => ({ ...prev, [name]: value })); // formData 상태 업데이트
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // 이미지 업로드 시 호출되는 함수
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; // 업로드된 파일을 가져옴
-    if (!file) return; // 파일이 없으면 리턴
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const imageData = new FormData(); // FormData 객체 생성
-    imageData.append("image", file); // 이미지 파일 추가
+    const imageData = new FormData();
+    imageData.append("image", file);
 
     try {
-      // imgBB API에 이미지 업로드 요청
       const response = await axios.post(
         "https://api.imgbb.com/1/upload",
         imageData,
         {
           params: {
-            key: "115376878bc76479b9c6775a72f120aa", // imgBB API 키
+            key: "115376878bc76479b9c6775a72f120aa",
           },
         }
       );
 
-      const menu_image_url = response.data.data.url; // 업로드된 이미지 URL 가져옴
-      setFormData((prev) => ({ ...prev, menu_image_url })); // formData 상태 업데이트
-      setUploadImgurl(menu_image_url); // uploadImgUrl 상태 업데이트
+      const menu_image_url = response.data.data.url;
+      setFormData((prev) => ({ ...prev, menu_image_url }));
+      setUploadImgurl(menu_image_url);
     } catch (error) {
-      console.error("Image upload error:", error); // 에러 로그 출력
+      console.error("Image upload error:", error);
     }
   };
 
   // 폼 제출 시 호출되는 함수
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // 기본 폼 제출 동작 막음
-    onSubmit(formData); // onSubmit 함수 호출
+    e.preventDefault();
+    const submissionData = {
+      ...formData,
+      menu_ingredients: selectedIngredients.join(", "),
+    };
+    onSubmit(submissionData);
+  };
+
+  // 재료 선택 시 호출되는 함수
+  const handleIngredientsChange = (newIngredients: string[]) => {
+    setSelectedIngredients(newIngredients);
+    setFormData((prev) => ({
+      ...prev,
+      menu_ingredients: newIngredients.join(", "),
+    }));
   };
 
   return (
     <>
       <style>
         {`
-          /* 숫자 입력 필드의 업다운 버튼을 숨김 */
           input[type=number]::-webkit-outer-spin-button,
           input[type=number]::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
           }
           input[type=number] {
-            -moz-appearance: textfield; /* Firefox에서 업다운 버튼 숨기기 */
+            -moz-appearance: textfield;
           }
         `}
       </style>
@@ -111,8 +129,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
         onSubmit={handleSubmit}
         className="space-y-6 p-4 bg-white rounded-lg shadow-md"
       >
-        {" "}
-        {/* 폼 요소 */}
         <div>
           <label
             htmlFor="store_id"
@@ -125,7 +141,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             value={formData.store_id}
             onChange={handleChange}
             name="store_id"
-            required
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           >
             <option value="" disabled>
@@ -151,7 +166,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             onChange={handleChange}
             name="menu_name"
             placeholder="메뉴 이름"
-            required
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           />
         </div>
@@ -168,7 +182,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             onChange={handleChange}
             name="menu_description"
             placeholder="설명"
-            required
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           />
         </div>
@@ -186,7 +199,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             name="menu_price"
             type="number"
             placeholder="가격"
-            required
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md appearance-none"
           />
         </div>
@@ -202,7 +214,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             type="file"
             name="menu_imageUrl"
             onChange={handleImageUpload}
-            required
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           />
           {uploadImgUrl && (
@@ -227,7 +238,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             name="menu_cooking_time"
             type="number"
             placeholder="조리 시간 (분)"
-            required
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md appearance-none"
           />
         </div>
@@ -243,7 +253,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             value={formData.menu_difficulty}
             onChange={handleChange}
             name="menu_difficulty"
-            required
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           >
             <option value="" disabled>
@@ -254,21 +263,34 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             <option value="Hard">어려움</option>
           </select>
         </div>
+
         <div>
           <label
-            htmlFor="menu_calories"
+            htmlFor="ingredients"
+            className="block text-sm font-medium text-gray-700"
+          >
+            재료
+          </label>
+          <IngredientsInput
+            selectedIngredients={selectedIngredients}
+            onChange={handleIngredientsChange}
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="calories"
             className="block text-sm font-medium text-gray-700"
           >
             칼로리
           </label>
           <input
-            id="menu_calories"
+            id="calories"
             value={formData.menu_calories}
             onChange={handleChange}
             name="menu_calories"
             type="number"
             placeholder="칼로리"
-            required
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md appearance-none"
           />
         </div>
@@ -286,7 +308,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             name="quantity"
             type="number"
             placeholder="초기 수량"
-            required
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md appearance-none"
           />
         </div>
