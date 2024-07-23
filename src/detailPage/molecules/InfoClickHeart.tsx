@@ -41,6 +41,7 @@ const InfoClickHeart = ({ store_id, member_idx }: InfoClickHeartProps) => {
         is_favorite: newFavoritesStatus,
       });
       setIsFavorite(newFavoritesStatus);
+      // alert("등록되었습니다.");
     } catch (error) {
       console.error("찜 상태 업데이트 중 오류 발생:", error);
     }

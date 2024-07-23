@@ -10,7 +10,7 @@ const InfoBackBtn = () => {
   };
   return (
     <div
-      className="text-lg text-white flex text-center p-2.5"
+      className="text-lg text-white flex text-center p-2.5 hover:cursor-pointer"
       onClick={backBtn}
     >
       <FontAwesomeIcon icon={faArrowLeft} />

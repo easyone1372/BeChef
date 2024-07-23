@@ -1,4 +1,4 @@
-import InfoStar from "../atom/InfoSetStar";
+import InfoSetStar from "../atom/InfoSetStar";
 import InfoTitle from "../atom/InfoTitle";
 import InfoClickHeart from "./InfoClickHeart";
 
@@ -20,7 +20,7 @@ const InfoTitleBox = ({
     <div className="flex flex-col justify-center items-center gap-2 border-x-0 border-t-0 border-b border-solid ">
       <InfoTitle content={titleContent}></InfoTitle>
       <div className="flex justify-center items-center gap-px10  mb-4">
-        <InfoStar starNum={titleStarNum}></InfoStar>
+        <InfoSetStar starNum={titleStarNum} />
         <InfoClickHeart store_id={store_id} member_idx={member_idx} />
       </div>
     </div>

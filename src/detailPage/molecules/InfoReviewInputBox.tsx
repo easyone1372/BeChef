@@ -47,6 +47,12 @@ const InfoReviewInputBox = ({
       setComment(""); // 입력 필드 초기화
       setResetInput(true);
       setReviewSubmitted(true); // 제출 상태 업데이트
+
+      // 리뷰 목록 갱신
+      const url = `http://localhost:3001/api/info_review/${store_id}`;
+      const response = await axios.get(url);
+      const data: InfoReviewComponentProps[] = response.data;
+      setInfoReviewList(data); // 상태를 직접 업데이트
     } catch (error) {
       console.error("리뷰 제출 중 오류 발생:", error);
     }

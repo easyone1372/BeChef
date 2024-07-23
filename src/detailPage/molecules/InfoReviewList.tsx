@@ -12,6 +12,7 @@ type InfoReviewListProps = {
   member_idx: number | null;
   infoNewReviewList: InfoReviewComponentProps[];
 };
+
 const InfoReviewList = ({
   store_id,
   member_idx,
@@ -28,6 +29,10 @@ const InfoReviewList = ({
       const response = await axios.get(url);
       const data: InfoReviewComponentProps[] = response.data;
       console.log("리뷰 데이터: ", data);
+      const sortedData = data.sort(
+        (a, b) =>
+          new Date(b.reviewDate).getTime() - new Date(a.reviewDate).getTime()
+      );
       setInfoReviewList(data);
     } catch (error) {
       console.error("리뷰 정보를 가져오는 중 오류 발생: ", error);
@@ -39,22 +44,28 @@ const InfoReviewList = ({
     fetchReview();
   }, [fetchReview]); // fetchReview 함수의 변경 여부에 따라 useEffect가 재실행
 
+  useEffect(() => {
+    // infoNewReviewList가 변경될 때 상태 업데이트
+    fetchReview();
+  }, [infoNewReviewList, fetchReview]);
+
   console.log("새로운 데이터:", infoNewReviewList);
 
-  const handleDeleteReview = useCallback(async (review_id: number) => {
-    try {
-      console.log("리뷰 삭제 요청 시작:", review_id);
-      await axios.delete(
-        `http://localhost:3001/api/review_delete/${review_id}`
-      );
-      console.log("리뷰 삭제 요청 완료");
-      setInfoReviewList((prevList) =>
-        prevList.filter((review) => review.review_id !== review_id)
-      );
-    } catch (error) {
-      console.error("리뷰 삭제 중 오류 발생:", error);
-    }
-  }, []);
+  const handleDeleteReview = useCallback(
+    async (review_id: number) => {
+      try {
+        console.log("리뷰 삭제 요청 시작:", review_id);
+        await axios.delete(
+          `http://localhost:3001/api/review_delete/${review_id}`
+        );
+        console.log("리뷰 삭제 요청 완료");
+        fetchReview();
+      } catch (error) {
+        console.error("리뷰 삭제 중 오류 발생:", error);
+      }
+    },
+    [fetchReview]
+  );
 
   const handleEditSubmit = useCallback(
     async (review_id: number, content: string, rating: number) => {
@@ -91,7 +102,7 @@ const InfoReviewList = ({
         </div>
       ))}
 
-      {infoNewReviewList.map(
+      {/*{localNewReviewList.map(
         (data) =>
           // infoNewReviewList에 있는 데이터 중 infoReviewList에 없는 데이터만 추가로 출력
           !infoReviewList.some(
@@ -112,7 +123,7 @@ const InfoReviewList = ({
               )}
             </div>
           )
-      )}
+      )}*/}
     </div>
   );
 };
