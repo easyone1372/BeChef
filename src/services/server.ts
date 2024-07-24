@@ -406,6 +406,36 @@ app.delete(
   }
 );
 
+// 리뷰 별점 평균 업데이트
+app.post(
+  "/api/update_store_rating/:store_id",
+  async (req: Request, res: Response) => {
+    const store_id = parseInt(req.params.store_id, 10);
+
+    try {
+      const query = `
+      SELECT AVG(review_rating) AS average_rating
+      FROM reviews
+      WHERE store_id = ?;
+    `;
+      const [rows] = await connection.execute(query, [store_id]);
+      const averageRating = (rows as any)[0].average_rating;
+
+      const updateQuery = `
+      UPDATE stores
+      SET store_rating = ?
+      WHERE store_id = ?;
+    `;
+      await connection.execute(updateQuery, [averageRating, store_id]);
+
+      res.json({ message: "별점 평균이 업데이트되었습니다." });
+    } catch (err) {
+      console.error("별점 평균 업데이트 중 오류 발생:", err);
+      res.status(500).json({ error: "별점 평균 업데이트 중 오류 발생" });
+    }
+  }
+);
+
 // 민석님 서버
 
 // 특정 가게의 모든 밀키트 재고 조회
