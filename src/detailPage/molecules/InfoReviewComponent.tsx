@@ -2,7 +2,7 @@ import { useState } from "react";
 import InfoMenuText from "../atom/InfoMenuText";
 import InfoSubTitle from "../atom/InfoSubTitle";
 import InfoMenuBox from "./InfoMenuBox";
-import InfoStar from "../atom/InfoSetStar";
+import InfoSetStar from "../atom/InfoSetStar";
 
 //상세페이지 - 리뷰출력 컴포컨트 구성
 export type InfoReviewComponentProps = {
@@ -24,7 +24,7 @@ const InfoReviewComponent = ({
     <div className="flex flex-col gap-1" key={review_id}>
       <div className="text-bold">{userName}</div>
       <div className="flex gap-1">
-        <InfoStar starNum={review_rating} />
+        <InfoSetStar starNum={review_rating} />
         <span>{reviewDate}</span>
       </div>
       <InfoMenuText content={comment} />

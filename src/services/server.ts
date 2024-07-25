@@ -406,7 +406,7 @@ app.delete(
   }
 );
 
-// 리뷰 별점 평균 업데이트
+// 상세 페이지 - 리뷰 별점 평균 업데이트: database
 app.post(
   "/api/update_store_rating/:store_id",
   async (req: Request, res: Response) => {
@@ -432,6 +432,29 @@ app.post(
     } catch (err) {
       console.error("별점 평균 업데이트 중 오류 발생:", err);
       res.status(500).json({ error: "별점 평균 업데이트 중 오류 발생" });
+    }
+  }
+);
+
+// 상세페이지 - 상점 별점 평균 업데이트: 화면 출력
+app.get(
+  "/api/average_rating/:store_id",
+  async (req: Request, res: Response) => {
+    const store_id = parseInt(req.params.store_id, 10);
+
+    try {
+      const query = `
+      SELECT ROUND(AVG(review_rating), 1) AS average_rating
+      FROM reviews
+      WHERE store_id = ?;
+    `;
+      const [rows] = await connection.execute(query, [store_id]);
+      const averageRating = (rows as any)[0].average_rating || 0;
+
+      res.json(averageRating);
+    } catch (err) {
+      console.error("별점 평균 조회 중 오류 발생:", err);
+      res.status(500).json({ error: "별점 평균 조회 중 오류 발생" });
     }
   }
 );

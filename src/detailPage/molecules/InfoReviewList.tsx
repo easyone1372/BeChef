@@ -11,12 +11,14 @@ type InfoReviewListProps = {
   store_id: number;
   member_idx: number | null;
   infoNewReviewList: InfoReviewComponentProps[];
+  fetchAverageRating: () => void; // 별점 평균 갱신 함수
 };
 
 const InfoReviewList = ({
   store_id,
   member_idx,
   infoNewReviewList,
+  fetchAverageRating,
 }: InfoReviewListProps) => {
   const [infoReviewList, setInfoReviewList] = useState<
     InfoReviewComponentProps[]
@@ -27,17 +29,23 @@ const InfoReviewList = ({
     try {
       const url = `http://localhost:3001/api/info_review/${store_id}`;
       const response = await axios.get(url);
-      const data: InfoReviewComponentProps[] = response.data;
+      const data: InfoReviewComponentProps[] = response.data.reverse();
       console.log("리뷰 데이터: ", data);
-      const sortedData = data.sort(
-        (a, b) =>
-          new Date(b.reviewDate).getTime() - new Date(a.reviewDate).getTime()
-      );
       setInfoReviewList(data);
     } catch (error) {
       console.error("리뷰 정보를 가져오는 중 오류 발생: ", error);
     }
-  }, [store_id]); // store_id가 변경될 때마다 fetchReview 함수 재생성
+  }, [store_id]);
+
+  const updateStoreRating = useCallback(async () => {
+    try {
+      await axios.post(
+        `http://localhost:3001/api/update_store_rating/${store_id}`
+      );
+    } catch (error) {
+      console.error("별점 평균 업데이트 중 오류 발생: ", error);
+    }
+  }, [store_id]);
 
   // 컴포넌트가 마운트될 때 리뷰 데이터를 가져옴
   useEffect(() => {
@@ -49,8 +57,6 @@ const InfoReviewList = ({
     fetchReview();
   }, [infoNewReviewList, fetchReview]);
 
-  console.log("새로운 데이터:", infoNewReviewList);
-
   const handleDeleteReview = useCallback(
     async (review_id: number) => {
       try {
@@ -59,12 +65,14 @@ const InfoReviewList = ({
           `http://localhost:3001/api/review_delete/${review_id}`
         );
         console.log("리뷰 삭제 요청 완료");
-        fetchReview();
+        await fetchReview();
+        await updateStoreRating();
+        await fetchAverageRating();
       } catch (error) {
         console.error("리뷰 삭제 중 오류 발생:", error);
       }
     },
-    [fetchReview]
+    [fetchReview, updateStoreRating, fetchAverageRating]
   );
 
   const handleEditSubmit = useCallback(
@@ -77,12 +85,14 @@ const InfoReviewList = ({
             review_rating: rating,
           }
         );
-        fetchReview(); // 리뷰 목록 갱신
+        await fetchReview(); // 리뷰 목록 갱신
+        await updateStoreRating();
+        await fetchAverageRating();
       } catch (error) {
         console.error("리뷰 수정 중 오류 발생:", error);
       }
     },
-    [fetchReview]
+    [fetchReview, updateStoreRating, fetchAverageRating]
   );
 
   return (
@@ -101,29 +111,6 @@ const InfoReviewList = ({
           )}
         </div>
       ))}
-
-      {/*{localNewReviewList.map(
-        (data) =>
-          // infoNewReviewList에 있는 데이터 중 infoReviewList에 없는 데이터만 추가로 출력
-          !infoReviewList.some(
-            (existingReview) =>
-              existingReview.member_idx === data.member_idx &&
-              existingReview.reviewDate === data.reviewDate
-          ) && (
-            <div key={data.review_id} className="relative flex justify-between">
-              <InfoReviewComponent {...data} />
-              {member_idx !== null && member_idx === data.member_idx && (
-                <InfoReviewEditBox
-                  review_id={data.review_id}
-                  comment={data.comment}
-                  rating={data.review_rating}
-                  onDelete={handleDeleteReview}
-                  onEditSubmit={handleEditSubmit}
-                />
-              )}
-            </div>
-          )
-      )}*/}
     </div>
   );
 };
