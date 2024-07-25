@@ -20,6 +20,7 @@ const connection = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
 });
+
 // 쿼리 실행 함수
 const executeQuery = async (query: string, params: any[], res: Response) => {
   try {
@@ -227,8 +228,8 @@ app.get("/api/info_time/:store_id", (req: Request, res: Response) => {
         WHEN 'Saturday' THEN 6
         WHEN 'Sunday' THEN 7
       END AS storeDayOfWeek,
-      open_time AS openTime,
-      close_time AS closeTime,
+      opentime AS openTime,
+      closetime AS closeTime,
       is_closed AS isClosed
     FROM store_hours
     WHERE store_id = ?;
@@ -239,14 +240,27 @@ app.get("/api/info_time/:store_id", (req: Request, res: Response) => {
 //상세 페이지 - 찜 상태 조회
 app.get(
   "/api/favorites/:store_id/:member_idx",
-  (req: Request, res: Response) => {
-    const { member_idx, store_id } = req.params;
+  async (req: Request, res: Response) => {
+    const { store_id, member_idx } = req.params;
     const query = `
     SELECT is_favorite 
     FROM favorites
     WHERE store_id = ? AND member_idx = ?;
   `;
-    executeQuery(query, [store_id, member_idx], res); // 매개변수 순서 확인
+    //executeQuery(query, [store_id, member_idx], res);
+
+    try {
+      const [results] = await connection.execute(query, [store_id, member_idx]);
+      // 결과를 타입으로 명시
+      const formattedResults = results as [{ is_favorite: number }];
+
+      // 결과가 없을 경우 기본값 설정
+      res.json(formattedResults[0] || { is_favorite: 0 });
+      console.log("찜 상태 조회:", formattedResults[0]);
+    } catch (err) {
+      console.error("찜 목록 로딩 중 오류 발생:", err);
+      res.status(500).json({ error: "내부 서버 오류" });
+    }
   }
 );
 

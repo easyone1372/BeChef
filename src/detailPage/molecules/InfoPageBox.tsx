@@ -41,17 +41,7 @@ const InfoPageBox = ({
     return <div>Loading...</div>;
   }
   // console.log("infoPageData:", infoPageData);
-  // return (
-  //   <div>
-  //     <InfoPageComponent
-  //       name={infoPageData.name}
-  //       rating={infoPageData.rating}
-  //       imageUrl={infoPageData.imageUrl}
-  //       address={infoPageData.address}
-  //       phone={infoPageData.phone}
-  //     />
-  //   </div>
-  // );
+
   return (
     <div className="drop-shadow-lg bg-white rounded-lg">
       <InfoPageComponent

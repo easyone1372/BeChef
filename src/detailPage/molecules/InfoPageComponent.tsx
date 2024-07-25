@@ -13,7 +13,6 @@ export type InfoPageComponentProps = {
   member_idx: number | null;
 };
 
-//이게맞아?
 const InfoPageComponent = ({
   store_name,
   store_rating,
