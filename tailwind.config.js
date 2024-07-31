@@ -19,7 +19,6 @@ module.exports = {
         px250: "250px",
         px300: "300px",
         px350: "350px",
-        px360: "360px",
         px400: "400px",
         px415: "415px",
         px445: "445px",
@@ -29,7 +28,6 @@ module.exports = {
       },
       height: {
         custom: "900px",
-        px50: "50px",
         px70: "70px",
         px85: "85px",
         px100: "100px",
