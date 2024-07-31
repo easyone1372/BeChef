@@ -5,8 +5,8 @@ import SignUp from "./signin_signup/organisms/SignUp";
 import InfoPage from "./detailPage/organisms/InfoPage";
 import HomePage from "./admin/page/HomePage";
 import InventoryManagementPage from "./admin/page/InventoryManagementPage";
-import UserPage from "./admin/page/UserPage";
 import MenuRegistrationPage from "./admin/page/MenuRegistrationPage";
+import MemberPage from "./admin/page/MemberPage";
 
 const App = () => {
   const storeId = 1;
@@ -18,9 +18,12 @@ const App = () => {
         <Route path="sign-up" element={<SignUp />} />
         <Route path="/information/:store_id" element={<InfoPage />} />
         <Route path="/HomePage" element={<HomePage />} />
-        <Route path="/inventory" element={<InventoryManagementPage />} />
-        <Route path="/user" element={<UserPage />} />
-        <Route path="/menu-registration" element={<MenuRegistrationPage />} />
+        <Route path="/admin/inventory" element={<InventoryManagementPage />} />
+        <Route path="/admin/user" element={<MemberPage />} />
+        <Route
+          path="/admin/menu-registration"
+          element={<MenuRegistrationPage />}
+        />
       </Routes>
       <Link to={`/information/${storeId}`}></Link>
     </Router>

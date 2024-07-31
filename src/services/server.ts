@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import mysql from "mysql2/promise"; // 비동기 처리를 위해 mysql2의 promise API 사용
 import { QueryError, ResultSetHeader, RowDataPacket } from "mysql2";
-import axios from "axios";
 
 const app = express();
 app.use(cors());
@@ -34,127 +33,90 @@ const executeQuery = async (query: string, params: any[], res: Response) => {
 };
 
 //mapPage에 정보 불러오기
-app.get("/search", async (req: Request, res: Response) => {
-  const { query } = req.query;
+// app.get("/search", async (req: Request, res: Response) => {
+//   const { query } = req.query;
 
-  if (!query) {
-    return res.json([]);
-  }
+//   if (!query) {
+//     return res.json([]);
+//   }
 
-  const searchQuery = `
-    SELECT
-      s.store_id,
-      s.store_name,
-      s.store_address,
-      s.store_latitude,
-      s.store_longitude,
-      s.store_rating,
-      COALESCE(GROUP_CONCAT(DISTINCT m.menu_name ORDER BY m.menu_name SEPARATOR ', '), '') AS menu_names,
-      COALESCE(r.reviewCount, 0) AS reviewCount
-    FROM
-      stores s
-    LEFT JOIN
-      menus m ON s.store_id = m.store_id
-    LEFT JOIN
-      (SELECT store_id, COUNT(*) AS reviewCount FROM reviews GROUP BY store_id) r ON s.store_id = r.store_id
-    WHERE
-      s.store_name LIKE ?
-      OR s.store_address LIKE ?
-      OR m.menu_name LIKE ?
-    GROUP BY
-      s.store_id, s.store_name, s.store_address, s.store_latitude, s.store_longitude, s.store_rating, r.reviewCount
-  `;
+//   const searchQuery = `
+//     SELECT
+//       s.store_id,
+//       s.store_name,
+//       s.store_address,
+//       s.store_latitude,
+//       s.store_longitude,
+//       s.store_rating,
+//       COALESCE(GROUP_CONCAT(DISTINCT m.menu_name ORDER BY m.menu_name SEPARATOR ', '), '') AS menu_names,
+//       COALESCE(r.reviewCount, 0) AS reviewCount
+//     FROM
+//       stores s
+//     LEFT JOIN
+//       menus m ON s.store_id = m.store_id
+//     LEFT JOIN
+//       (SELECT store_id, COUNT(*) AS reviewCount FROM reviews GROUP BY store_id) r ON s.store_id = r.store_id
+//     WHERE
+//       s.store_name LIKE ?
+//       OR s.store_address LIKE ?
+//       OR m.menu_name LIKE ?
+//     GROUP BY
+//       s.store_id, s.store_name, s.store_address, s.store_latitude, s.store_longitude, s.store_rating, r.reviewCount
+//   `;
 
-  try {
-    const results = await executeQuery(
-      searchQuery,
-      [`%${query}%`, `%${query}%`, `%${query}%`],
-      res
-    ); // res를 executeQuery 함수에 전달
-  } catch (err) {
-    console.error("쿼리 실행 중 오류 발생:", err);
-    res.status(500).json({ error: "내부 서버 오류" });
-  }
-});
+//   try {
+//     const results = await executeQuery(
+//       searchQuery,
+//       [`%${query}%`, `%${query}%`, `%${query}%`],
+//       res
+//     ); // res를 executeQuery 함수에 전달
+//   } catch (err) {
+//     console.error("쿼리 실행 중 오류 발생:", err);
+//     res.status(500).json({ error: "내부 서버 오류" });
+//   }
+// });
 
 // 모달 -> 마이 페이지 -> 리뷰 리스트 가져오기 [+날짜] (로그인 하면 해당 유저꺼로 수정하던가 해야 될듯)
-app.get("/api/reviews", async (req: Request, res: Response) => {
-  const query = `SELECT comment, review_date FROM reviews`;
-  try {
-    const [rows] = await connection.execute<RowDataPacket[]>(query);
-    const formattedRows = rows.map((row) => {
-      if (row.review_date) {
-        const date = new Date(row.review_date);
-        const formattedDate = `${date.getFullYear()}.${(date.getMonth() + 1)
-          .toString()
-          .padStart(2, "0")}.${date
-          .getDate()
-          .toString()
-          .padStart(2, "0")} ${date
-          .getHours()
-          .toString()
-          .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-        row.review_date = formattedDate;
-      }
-      return row;
-    });
-    res.json(formattedRows);
-  } catch (err) {
-    console.error("쿼리 실행 중 오류 발생:", err);
-    res.status(500).json({ error: "내부 서버 오류" });
-  }
-});
+// app.get("/api/reviews", async (req: Request, res: Response) => {
+//   const query = `SELECT comment, review_date FROM reviews`;
+//   try {
+//     const [rows] = await connection.execute<RowDataPacket[]>(query);
+//     const formattedRows = rows.map((row) => {
+//       if (row.review_date) {
+//         const date = new Date(row.review_date);
+//         const formattedDate = `${date.getFullYear()}.${(date.getMonth() + 1)
+//           .toString()
+//           .padStart(2, "0")}.${date
+//           .getDate()
+//           .toString()
+//           .padStart(2, "0")} ${date
+//           .getHours()
+//           .toString()
+//           .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+//         row.review_date = formattedDate;
+//       }
+//       return row;
+//     });
+//     res.json(formattedRows);
+//   } catch (err) {
+//     console.error("쿼리 실행 중 오류 발생:", err);
+//     res.status(500).json({ error: "내부 서버 오류" });
+//   }
+// });
 
-// 모달 -> 마이 페이지 -> 찜 리스트 가져오기 (로그인 하면 해당 유저꺼로 수정하던가 해야 될듯)
-app.get("/api/favorites", async (req: Request, res: Response) => {
-  const query =
-    "SELECT store_name FROM favorites JOIN stores ON favorites.store_id = stores.store_id WHERE is_favorite = 1";
-  try {
-    const [rows] = await connection.execute<RowDataPacket[]>(query);
-    const favorites = rows.map((row) => row.store_name);
-    res.json(favorites);
-  } catch (err) {
-    console.error("쿼리 실행 중 오류 발생:", err);
-    res.status(500).json({ error: "내부 서버 오류" });
-  }
-});
-
-// 회원탈퇴기능
-
-app.delete(
-  "/api/delete-account/:memberId",
-  async (req: Request, res: Response) => {
-    const memberId = req.params.memberId;
-
-    try {
-      await connection.beginTransaction();
-
-      // reviews 테이블에서 삭제
-      await connection.execute("DELETE FROM reviews WHERE member_idx = ?", [
-        memberId,
-      ]);
-
-      // favorites 테이블에서 삭제
-      await connection.execute("DELETE FROM favorites WHERE member_idx = ?", [
-        memberId,
-      ]);
-
-      // member 테이블에서 삭제
-      await connection.execute("DELETE FROM member WHERE member_idx = ?", [
-        memberId,
-      ]);
-
-      await connection.commit();
-      res.status(200).send("Account deleted successfully");
-    } catch (error) {
-      await connection.rollback();
-      console.error("Error deleting account:", error);
-      res.status(500).send("Error deleting account");
-    } finally {
-      await connection.end();
-    }
-  }
-);
+// // 모달 -> 마이 페이지 -> 찜 리스트 가져오기 (로그인 하면 해당 유저꺼로 수정하던가 해야 될듯)
+// app.get("/api/favorites", async (req: Request, res: Response) => {
+//   const query =
+//     "SELECT store_name FROM favorites JOIN stores ON favorites.store_id = stores.store_id WHERE is_favorite = 1";
+//   try {
+//     const [rows] = await connection.execute<RowDataPacket[]>(query);
+//     const favorites = rows.map((row) => row.store_name);
+//     res.json(favorites);
+//   } catch (err) {
+//     console.error("쿼리 실행 중 오류 발생:", err);
+//     res.status(500).json({ error: "내부 서버 오류" });
+//   }
+// });
 
 // 지원님 서버
 
@@ -638,6 +600,7 @@ app.post("/api/mealkit", async (req: Request, res: Response) => {
       menu_image_url,
       menu_cooking_time,
       menu_difficulty,
+      menu_ingredients,
       menu_calories,
       quantity,
     } = req.body; // 요청 본문에서 데이터 추출
@@ -653,6 +616,7 @@ app.post("/api/mealkit", async (req: Request, res: Response) => {
       !menu_image_url ||
       !menu_cooking_time ||
       !menu_difficulty ||
+      !menu_ingredients ||
       !menu_calories ||
       !quantity
     ) {
@@ -663,7 +627,7 @@ app.post("/api/mealkit", async (req: Request, res: Response) => {
     // menus 테이블에 새 메뉴 추가
     const [menuResult] = await conn.execute(
       `INSERT INTO menus (store_id , menu_name, menu_description, menu_price, menu_image_url, menu_cooking_time, menu_difficulty, menu_calories)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?,?)`,
       [
         Number(store_id),
         menu_name,
@@ -677,6 +641,17 @@ app.post("/api/mealkit", async (req: Request, res: Response) => {
     );
     const menu_id = (menuResult as any).insertId; // 삽입된 메뉴 ID 가져오기
     console.log("메뉴 추가 성공, menuId:", menu_id);
+
+    // menu_ingredients 테이블에 해당 음식의 재료등록
+    const ingredientsArray = menu_ingredients.split(", ");
+    for (const ingredient of ingredientsArray) {
+      await conn.execute(
+        `INSERT INTO menu_ingredients(menu_id, ingredient) VALUES(?, ?)`,
+        [menu_id, ingredient]
+      );
+    }
+
+    console.log("해당 음식 재료등록 완료:", ingredientsArray);
 
     // inventory 테이블에 재고 정보 추가
     await conn.execute(
