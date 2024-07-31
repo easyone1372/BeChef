@@ -7,18 +7,17 @@ export type Store = {
   store_id: number;
   store_name: string;
   store_address: string;
-  menu_name: string;
   store_latitude: number;
   store_longitude: number;
-  img: string;
   store_rating: number;
   reviewCount: number;
+  img: string;
 };
 
 type SearchResultsProps = {
   results: Store[];
   user_id?: number;
-  onMarkerHover: (storeId: number | null) => void; //마커 hover 이벤트 콜백 함수
+  onMarkerHover: (storeId: number | null) => void;
 };
 
 const SearchResults = ({
@@ -32,10 +31,9 @@ const SearchResults = ({
 
   console.log(results);
 
-  //리스트 아이템 hover 이벤트 핸들러
   const handleListHover = (storeId: number | null) => {
     onMarkerHover(storeId);
-  }; // 마커 hover 이벤트 전달};
+  };
 
   return (
     <ul className="mt-4 h-[900px] overflow-y-scroll">
@@ -45,10 +43,10 @@ const SearchResults = ({
           className="border p-2 mb-2 hover:bg-skipMB transition-colors duration-200"
           onMouseEnter={() => {
             handleListHover(result.store_id);
-          }} // 마우스 오버 이벤트 함수 호출
+          }}
           onMouseLeave={() => {
             handleListHover(null);
-          }} // 마우스 아웃 이벤트 함수 호출 (모든 마커 hover 해제)
+          }}
         >
           <div className="w-full h-70">
             <img
@@ -67,7 +65,6 @@ const SearchResults = ({
               user_id={user_id}
               content="상세 정보"
             />
-            {/* <InfoClickHeart storeId={result.storeId} userId={result.userId} /> */}
           </div>
         </li>
       ))}

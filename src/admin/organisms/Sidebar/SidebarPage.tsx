@@ -10,15 +10,19 @@ const Sidebar = () => {
         <Management
           panelTitle={{ title: "회원관리" }}
           panelLayout={{
-            panels: [{ panelName: <Link to="/user"> 회원 정보 관리</Link> }],
+            panels: [
+              { panelName: <Link to="/admin/user"> 회원 정보 관리</Link> },
+            ],
           }}
         />
         <Management
           panelTitle={{ title: "재고관리" }}
           panelLayout={{
             panels: [
-              { panelName: <Link to="/menu-registration">메뉴등록</Link> },
-              { panelName: <Link to="/inventory">재고관리</Link> },
+              {
+                panelName: <Link to="/admin/menu-registration">메뉴등록</Link>,
+              },
+              { panelName: <Link to="/admin/inventory">재고관리</Link> },
             ],
           }}
         />

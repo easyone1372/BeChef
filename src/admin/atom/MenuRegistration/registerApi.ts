@@ -11,7 +11,7 @@ export const fetchStores = async () => {
   }
 };
 
-// 밀키트를 등록하는 함수
+// 메뉴를 등록하는 함수
 export const registerMealKit = async (formData: {
   store_id: number;
   menu_name: string;
@@ -22,7 +22,7 @@ export const registerMealKit = async (formData: {
 }) => {
   try {
     const response = await axios.post(
-      "http://localhost:3001/api/mealkit",
+      "http://localhost:8080/api/mealkit",
       formData
     );
     return response.data;

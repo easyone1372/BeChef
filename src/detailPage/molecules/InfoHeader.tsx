@@ -7,10 +7,10 @@ const InfoHeader = () => {
       <div>
         <InfoBackBtn />
       </div>
-      <div className="w-150 h-12 flex items-center ">
-        <Logo url="" />
+      <div className="w-40 flex items-center ">
+        <Logo url="https://i.ibb.co/98s8n03/Logo.png" />
       </div>
-      <div className="w-px50"></div>
+      <div className="w-px50"></div> {/* 로고 가운데 정렬용 div */}
     </div>
   );
 };

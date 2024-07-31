@@ -3,32 +3,48 @@ import InfoReviewComponent, {
   InfoReviewComponentProps,
 } from "./InfoReviewComponent";
 import axios from "axios";
-import InfoReviewEdit from "./InfoReviewEditBox";
 import InfoReviewEditBox from "./InfoReviewEditBox";
+import { jwtDecode } from "jwt-decode";
+import { log } from "console";
 
-//상세 페이지 - 리뷰 데이터 가져와서 컴포넌트에 적용, 화면에 출력하는 컴포넌트
 type InfoReviewListProps = {
   store_id: number;
-  member_idx: number | null;
   infoNewReviewList: InfoReviewComponentProps[];
-  fetchAverageRating: () => void; // 별점 평균 갱신 함수
+  fetchAverageRating: () => void;
 };
 
 const InfoReviewList = ({
   store_id,
-  member_idx,
   infoNewReviewList,
   fetchAverageRating,
 }: InfoReviewListProps) => {
-  const [infoReviewList, setInfoReviewList] = useState<
-    InfoReviewComponentProps[]
-  >([]);
+  const [infoReviewList, setInfoReviewList] = useState<InfoReviewComponentProps[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // fetchReview 함수를 useCallback을 이용하여 메모이제이션
+  const getToken = () => {
+    return localStorage.getItem("jwt-token");
+  };
+
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        console.log("Decoded token:", decodedToken);
+        setCurrentUser(decodedToken);
+      } catch (error) {
+        console.error("토큰 디코딩 중 오류 발생:", error);
+      }
+    }
+  }, []);
+
   const fetchReview = useCallback(async () => {
     try {
-      const url = `http://localhost:3001/api/info_review/${store_id}`;
-      const response = await axios.get(url);
+      const token = getToken();
+      const url = `http://localhost:8080/api/info/info_review/${store_id}`;
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data: InfoReviewComponentProps[] = response.data.reverse();
       console.log("리뷰 데이터: ", data);
       setInfoReviewList(data);
@@ -37,23 +53,26 @@ const InfoReviewList = ({
     }
   }, [store_id]);
 
-  const updateStoreRating = useCallback(async () => {
+  const updateStoreRating = useCallback(async (rating: number) => {
     try {
+      const token = getToken();
       await axios.post(
-        `http://localhost:3001/api/update_store_rating/${store_id}`
+        `http://localhost:8080/api/info/update_store_rating/${store_id}`,
+        { reviewRating: rating },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
     } catch (error) {
       console.error("별점 평균 업데이트 중 오류 발생: ", error);
     }
   }, [store_id]);
 
-  // 컴포넌트가 마운트될 때 리뷰 데이터를 가져옴
   useEffect(() => {
     fetchReview();
-  }, [fetchReview]); // fetchReview 함수의 변경 여부에 따라 useEffect가 재실행
+  }, [fetchReview]);
 
   useEffect(() => {
-    // infoNewReviewList가 변경될 때 상태 업데이트
     fetchReview();
   }, [infoNewReviewList, fetchReview]);
 
@@ -61,35 +80,49 @@ const InfoReviewList = ({
     async (review_id: number) => {
       try {
         console.log("리뷰 삭제 요청 시작:", review_id);
+        const token = getToken();
         await axios.delete(
-          `http://localhost:3001/api/review_delete/${review_id}`
+          `http://localhost:8080/api/info/review_delete/${review_id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
         console.log("리뷰 삭제 요청 완료");
         await fetchReview();
-        await updateStoreRating();
         await fetchAverageRating();
+        alert("리뷰가 성공적으로 삭제되었습니다.");
       } catch (error) {
         console.error("리뷰 삭제 중 오류 발생:", error);
+        alert("리뷰 삭제 중 오류가 발생했습니다.");
       }
     },
-    [fetchReview, updateStoreRating, fetchAverageRating]
+    [fetchReview, fetchAverageRating]
   );
 
   const handleEditSubmit = useCallback(
-    async (review_id: number, content: string, rating: number) => {
+    async (reviewId: number, content: string, rating: number) => {
       try {
+        const token = getToken();
+
+        console.log("리뷰 수정:" + reviewId, content, rating);
+
         await axios.put(
-          `http://localhost:3001/api/review_update/${review_id}`,
+          `http://localhost:8080/api/info/review_update/${reviewId}`,
           {
             comment: content,
-            review_rating: rating,
+            reviewRating: rating,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
-        await fetchReview(); // 리뷰 목록 갱신
-        await updateStoreRating();
+        await fetchReview();
+        await updateStoreRating(rating); // 별점 업데이트 호출
         await fetchAverageRating();
+        alert("리뷰가 성공적으로 수정되었습니다.");
       } catch (error) {
         console.error("리뷰 수정 중 오류 발생:", error);
+        alert("리뷰 수정 중 오류가 발생했습니다.");
       }
     },
     [fetchReview, updateStoreRating, fetchAverageRating]
@@ -98,13 +131,13 @@ const InfoReviewList = ({
   return (
     <div className="max-w-768 w-full my-0 mx-auto flex flex-col gap-px20">
       {infoReviewList.map((data) => (
-        <div key={data.review_id} className="relative flex justify-between">
+        <div key={data.reviewId} className="relative flex justify-between">
           <InfoReviewComponent {...data} />
-          {member_idx !== null && member_idx === data.member_idx && (
+          {currentUser !== null && currentUser.idx === data.memberIdx && (
             <InfoReviewEditBox
-              review_id={data.review_id}
+              reviewId={data.reviewId}
               comment={data.comment}
-              rating={data.review_rating}
+              rating={data.reviewRating}
               onDelete={handleDeleteReview}
               onEditSubmit={handleEditSubmit}
             />

@@ -17,7 +17,7 @@ const InfoMenuList = ({ store_id }: InfoMenuListProps) => {
     const fetchMenu = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/info_menu/${store_id}`
+          `http://localhost:8080/api/info/info_menu/${store_id}`
         );
         const data = response.data.map((item: any) => ({
           ...item,

@@ -21,7 +21,7 @@ const InfoTitleBox = ({
       <InfoTitle content={titleContent}></InfoTitle>
       <div className="flex justify-center items-center gap-px10  mb-4">
         <InfoSetStar starNum={titleStarNum} />
-        <InfoClickHeart store_id={store_id} member_idx={member_idx} />
+        <InfoClickHeart storeId={store_id} />
       </div>
     </div>
   );

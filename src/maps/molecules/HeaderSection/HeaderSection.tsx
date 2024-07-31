@@ -17,6 +17,7 @@ const HeaderSection = () => {
     navigate("/sign-in");
   };
 
+
   const handleLogout = () => {
     localStorage.removeItem("jwt-token");
     setIsLoggedIn(false);
@@ -24,8 +25,8 @@ const HeaderSection = () => {
 
   return (
     <div className="flex justify-between items-center p-2 bg-skipDB text-white">
-      <div className="w-24 p-3 flex flex-col justify-center items-center">
-        <Logo url="logo.png" /> MealKit
+      <div className="w-36 justify-center items-center">
+        <Logo url="https://i.ibb.co/98s8n03/Logo.png" />
       </div>
       <div className="p-3">
         {isLoggedIn ? (

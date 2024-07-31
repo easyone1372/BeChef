@@ -3,16 +3,18 @@ import InfoPageComponent, { InfoPageComponentProps } from "./InfoPageComponent";
 import axios from "axios";
 
 export type InfoPageBoxProps = {
-  store_id: number;
-  member_idx: number | null;
+  store_id: number; // 가게ID
+  member_idx: number | null; //회원 ID, 회원이 로그인안한경우 null값
   averageRating: number; //별점 평균값
 };
 
 const InfoPageBox = ({
   store_id,
-  member_idx,
+  member_idx, 
   averageRating,
 }: InfoPageBoxProps) => {
+  
+    // infoPageData 상태를 선언하고 초기값을 null로 설정
   const [infoPageData, setInfoPageData] = useState<Omit<
     InfoPageComponentProps,
     "store_id" | "member_idx" | "store_rating"
@@ -22,7 +24,7 @@ const InfoPageBox = ({
     try {
       const response = await axios.get<
         Omit<InfoPageComponentProps, "store_id" | "member_idx" | "store_rating">
-      >(`http://localhost:3001/api/info_page/${store_id}`);
+      >(`http://localhost:8080/api/info/info_page/${store_id}`);
       const data = response.data;
       console.log("infopagebox에서 가져온 데이터", data);
       setInfoPageData(data);

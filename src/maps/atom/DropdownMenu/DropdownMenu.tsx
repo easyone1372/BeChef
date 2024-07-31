@@ -7,7 +7,7 @@ interface DropdownMenuProps {
   onLogout: () => void;
 }
 
-const DropdownMenu: React.FC<DropdownMenuProps> = ({ onLogout }) => {
+const DropdownMenu = ({ onLogout }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -28,8 +28,6 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ onLogout }) => {
     setShowModal(true);
     setIsOpen(false);
   };
-
-
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -66,7 +64,11 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ onLogout }) => {
           </>
         </div>
       )}
-      <Modal showModal={showModal} closeModal={() => setShowModal(false)} />
+      <Modal
+        showModal={showModal}
+        closeModal={() => setShowModal(false)}
+        onLogout={onLogout}
+      />
     </div>
   );
 };

@@ -4,57 +4,88 @@ import Navigation from "../organisms/Navigation/NavigationPage";
 import Sidebar from "../organisms/Sidebar/SidebarPage";
 import axios from "axios";
 import { Kit } from "../atom/Kit/Kit";
+import { jwtDecode } from "jwt-decode";
+import { log } from "console";
+import { json } from "stream/consumers";
 
 const InventoryManagementPage = () => {
   const [kits, setKits] = useState<Kit[]>([]);
   const [stores, setStores] = useState<
-    { store_id: number; store_name: string }[]
+    { storeId: number; storeName: string }[]
   >([]);
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
-    const loadStores = async () => {
+    const token = localStorage.getItem("jwt-token");
+    if (token) {
       try {
-        const response = await axios.get("http://localhost:3001/api/stores");
-        const fetchedStores = response.data;
-        setStores(fetchedStores);
-        if (fetchedStores.length > 0) {
-          setSelectedStoreId(fetchedStores[0].store_id);
-          console.log("store: ", fetchedStores);
-        }
+        const decodedToken: any = jwtDecode(token);
+        setIsAdmin(decodedToken.role === "ADMIN");
       } catch (error) {
-        console.error("Error fetching stores:", error);
+        console.error("Error decoding token:", error);
+        setIsAdmin(false);
       }
-    };
-    loadStores();
+    }
   }, []);
 
   useEffect(() => {
-    const loadKits = async () => {
-      if (selectedStoreId) {
+    if (isAdmin) {
+      const loadStores = async () => {
         try {
+          const token = localStorage.getItem("jwt-token");
           const response = await axios.get(
-            `http://localhost:3001/api/inventory/${selectedStoreId}`
+            "http://localhost:8080/api/admin/stores",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const fetchedStores = response.data;
+          setStores(fetchedStores);
+          if (fetchedStores.length > 0) {
+            setSelectedStoreId(fetchedStores[0].store_id);
+            JSON.stringify(fetchedStores, null, 2);
+
+            console.log();
+          }
+        } catch (error) {
+          console.error("Error fetching stores:", error);
+        }
+      };
+      loadStores();
+    }
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (isAdmin && selectedStoreId) {
+      const loadKits = async () => {
+        try {
+          const token = localStorage.getItem("jwt-token");
+          const response = await axios.get(
+            `http://localhost:8080/api/admin/inventory/${selectedStoreId}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
           );
           const fetchedKits: Kit[] = response.data.map((item: any) => ({
-            menu_id: item.menu_id,
-            menu_name: item.menu_name,
-            menu_description: item.menu_description,
-            menu_price: item.menu_price,
-            menu_image_url: item.menu_image_url,
-            quantity: item.quantity,
-            store_id: item.store_id,
-            store_name: item.store_name,
+            menu_id: item.menuId, //메뉴 ID
+            menu_name: item.menuName, //메뉴 이름
+            menu_description: item.menuDescription, //메뉴 설명
+            menu_price: item.menuPrice, //메뉴 가격
+            menu_image_url: item.menuImageUrl, //메뉴 이미지
+            quantity: item.quantity, // 수량
+            store_id: item.storeId, //가게 ID
+            store_name: item.storeName, // 가게 이름
           }));
           console.log(fetchedKits);
           setKits(fetchedKits);
         } catch (error) {
           console.error("Error fetching kits:", error);
         }
-      }
-    };
-    loadKits();
-  }, [selectedStoreId, stores]);
+      };
+      loadKits();
+    }
+  }, [selectedStoreId, stores, isAdmin]);
 
   const handleStoreChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedStoreId(Number(event.target.value));
@@ -67,6 +98,19 @@ const InventoryManagementPage = () => {
       )
     );
   };
+
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col h-screen bg-gray-100 items-center justify-center">
+        <h1 className="text-3xl font-bold text-red-600 mb-4">
+          접근 권한이 없습니다
+        </h1>
+        <p className="text-gray-600">
+          이 페이지는 관리자만 접근할 수 있습니다.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -83,8 +127,8 @@ const InventoryManagementPage = () => {
                 className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               >
                 {stores.map((store) => (
-                  <option key={store.store_id} value={store.store_id}>
-                    {store.store_name}
+                  <option key={store.storeId} value={store.storeId}>
+                    {store.storeName}
                   </option>
                 ))}
               </select>

@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import Navigation from "../organisms/Navigation/NavigationPage";
 import Sidebar from "../organisms/Sidebar/SidebarPage";
 import MenuRegistrationForm from "../organisms/MenuRegistration/MenuRegistrationForm";
 
 export type Store = {
-  store_id: number;
-  store_name: string;
+  storeId: number;
+  storeName: string;
 };
 
 type FormData = {
-  store_id: string;
-  menu_name: string;
-  menu_description: string;
-  menu_price: string;
-  menu_image_url: string;
-  menu_cooking_time: string;
-  menu_difficulty: string;
-  menu_calories: string;
+  storeId: number;
+  menuName: string;
+  menuDescription: string;
+  menuPrice: string;
+  menuImageUrl: string;
+  menuCookingTime: string;
+  menuDifficulty: string;
+  menuCalories: string;
   quantity: string;
 };
 
@@ -25,33 +26,64 @@ const MenuRegistrationPage: React.FC = () => {
   const [stores, setStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
-    const loadStores = async () => {
-      try {
-        const response = await axios.get("http://localhost:3001/api/stores");
-        setStores(response.data);
-      } catch (error) {
-        console.error("Error fetching stores:", error);
-        setMessage("가게 목록을 불러오는 중 오류가 발생했습니다.");
-      }
-    };
-    loadStores();
+    checkAdminStatus();
   }, []);
+
+  useEffect(() => {
+    if (isAdmin) {
+      loadStores();
+    }
+  }, [isAdmin]);
+
+  const checkAdminStatus = () => {
+    const token = localStorage.getItem("jwt-token");
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        setIsAdmin(decodedToken.role === "ADMIN");
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        setIsAdmin(false);
+      }
+    } else {
+      setIsAdmin(false);
+    }
+  };
+
+  const loadStores = async () => {
+    try {
+      const token = localStorage.getItem("jwt-token");
+      const response = await axios.get(
+        "http://localhost:8080/api/admin/stores",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("가게들 불러옴:", response.data);
+      setStores(response.data);
+    } catch (error) {
+      console.error("Error fetching stores:", error);
+      setMessage("가게 목록을 불러오는 중 오류가 발생했습니다.");
+    }
+  };
 
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
+    setIsSuccess(false);
 
-    // 데이터 유효성 검사
     if (
-      !formData.store_id ||
-      !formData.menu_name ||
-      !formData.menu_description ||
-      !formData.menu_price ||
-      !formData.menu_image_url ||
-      !formData.menu_cooking_time ||
-      !formData.menu_difficulty ||
-      !formData.menu_calories ||
+      !formData.storeId ||
+      !formData.menuName ||
+      !formData.menuDescription ||
+      !formData.menuPrice ||
+      !formData.menuImageUrl ||
+      !formData.menuCookingTime ||
+      !formData.menuDifficulty ||
+      !formData.menuCalories ||
       !formData.quantity
     ) {
       setMessage("모든 필드를 입력해주세요.");
@@ -60,40 +92,57 @@ const MenuRegistrationPage: React.FC = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:3001/api/mealkit", {
-        ...formData,
-        store_id: Number(formData.store_id),
-        menu_price: Number(formData.menu_price),
-        cooking_time: Number(formData.menu_cooking_time),
-        calories: Number(formData.menu_calories),
-        quantity: Number(formData.quantity),
-      });
-      setMessage(response.data.message);
+      const token = localStorage.getItem("jwt-token");
+      console.log(
+        "등록하려고 하는 메뉴의 정보:",
+        JSON.stringify(formData, null, 2)
+      );
+
+      const response = await axios.post(
+        "http://localhost:8080/api/admin/menu",
+        {
+          ...formData,
+          storeId: Number(formData.storeId),
+          menu_price: Number(formData.menuPrice),
+          menu_cooking_time: Number(formData.menuCookingTime),
+          menu_calories: Number(formData.menuCalories),
+          quantity: Number(formData.quantity),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setMessage("메뉴가 성공적으로 등록되었습니다.");
+      setIsSuccess(true);
     } catch (error) {
       console.error("Error registering mealkit:", error);
       if (axios.isAxiosError(error) && error.response) {
         setMessage(
-          `밀키트 등록 중 오류가 발생했습니다: ${
+          `메뉴 등록 중 오류가 발생했습니다: ${
             error.response.data.details || error.response.data.error
           }`
         );
       } else {
-        setMessage("밀키트 등록 중 오류가 발생했습니다.");
+        setMessage("메뉴 등록 중 오류가 발생했습니다.");
       }
+      setIsSuccess(false);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDelete = async (menu_id: number) => {
-    try {
-      await axios.delete(`http://localhost:3001/api/mealkit/${menu_id}`);
-      setMessage("밀키트가 성공적으로 삭제되었습니다.");
-    } catch (error) {
-      console.error("Error deleting mealkit:", error);
-      setMessage("밀키트 삭제 중 오류가 발생했습니다.");
-    }
-  };
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col h-screen bg-gray-100 items-center justify-center">
+        <h1 className="text-3xl font-bold text-red-600 mb-4">
+          접근 권한이 없습니다
+        </h1>
+        <p className="text-gray-600">
+          이 페이지는 관리자만 접근할 수 있습니다.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -107,17 +156,19 @@ const MenuRegistrationPage: React.FC = () => {
                 메뉴 등록
               </h3>
             </div>
-            {message && (
+            {isSuccess && (
               <div className="px-4 py-3 bg-green-100 text-green-700">
-                {message}
+                등록이 완료되었습니다.
               </div>
+            )}
+            {message && !isSuccess && (
+              <div className="px-4 py-3 bg-red-100 text-red-700">{message}</div>
             )}
             <div className="border-t border-gray-200">
               <div className="px-4 py-5 sm:p-6">
                 <MenuRegistrationForm
                   stores={stores}
                   onSubmit={handleSubmit}
-                  onDelete={handleDelete}
                   isLoading={isLoading}
                 />
               </div>

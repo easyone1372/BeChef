@@ -11,10 +11,7 @@ const InfoPage = () => {
   const { store_id } = useParams<{ store_id: string }>();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  // const member_idx = queryParams.get("member_idx");
-
-  // 임시 멤버 데이터 입력
-  const member_idx = 21;
+  const member_idx = queryParams.get("member_idx");
 
   // 별점 갱신 상태와 함수 추가
   const [ratingKey, setRatingKey] = useState(0);
@@ -28,7 +25,7 @@ const InfoPage = () => {
   const fetchAverageRating = useCallback(async () => {
     try {
       const response = await axios.get<number>(
-        `http://localhost:3001/api/average_rating/${store_id}`
+        `http://localhost:8080/api/info/average_rating/${store_id}`
       );
       setAverageRating(response.data);
     } catch (error) {

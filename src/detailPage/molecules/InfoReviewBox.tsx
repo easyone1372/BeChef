@@ -13,6 +13,7 @@ type InfoReviewBoxProps = {
   member_idx: number | null;
   onRatingUpdate: () => void; // 별점 갱신 함수 추가
 };
+
 const InfoReviewBox = ({
   store_id,
   member_idx,
@@ -25,7 +26,7 @@ const InfoReviewBox = ({
   const fetchReviewList = useCallback(async () => {
     try {
       const response = await axios.get<InfoReviewComponentProps[]>(
-        `http://localhost:3001/api/info_review/${store_id}`
+        `http://localhost:8080/api/info/info_review/${store_id}`
       );
       setInfoReviewList(response.data.reverse());
     } catch (error) {
@@ -50,7 +51,6 @@ const InfoReviewBox = ({
           />
           <InfoReviewList
             store_id={store_id}
-            member_idx={member_idx}
             infoNewReviewList={infoReviewList}
             fetchAverageRating={onRatingUpdate}
           />

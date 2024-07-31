@@ -1,71 +1,60 @@
 import React, { useState } from "react";
 import axios from "axios";
 import IngredientsInput from "../ingredients/IngredientsInput";
-import { Ingredient, ingredients } from "../../atom/ingredients/Ingredients";
 
-// Store 타입 정의
-type Store = {
-  store_id: number;
-  store_name: string;
+export type Store = {
+  storeId: number;
+  storeName: string;
 };
 
-// FormData 타입 정의
 type FormData = {
-  store_id: string;
-  menu_name: string;
-  menu_description: string;
-  menu_price: string;
-  menu_image_url: string;
-  menu_cooking_time: string;
-  menu_difficulty: string;
-  menu_ingredients: string;
-  menu_calories: string;
+  storeId: number;
+  menuName: string;
+  menuDescription: string;
+  menuPrice: string;
+  menuImageUrl: string;
+  menuCookingTime: string;
+  menuDifficulty: string;
+  menuIngredients: string;
+  menuCalories: string;
   quantity: string;
 };
 
-// MenuRegistrationFormProps 타입 정의
 type MenuRegistrationFormProps = {
   stores: Store[];
   onSubmit: (formData: FormData) => void;
-  onDelete: (menu_id: number) => void;
   isLoading: boolean;
 };
 
 const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
   stores,
   onSubmit,
-  onDelete,
   isLoading,
 }) => {
-  // formData 상태 정의 및 초기화
   const [formData, setFormData] = useState<FormData>({
-    store_id: "",
-    menu_name: "",
-    menu_description: "",
-    menu_price: "",
-    menu_image_url: "",
-    menu_cooking_time: "",
-    menu_difficulty: "",
-    menu_ingredients: "",
-    menu_calories: "",
+    storeId: 1,
+    menuName: "",
+    menuDescription: "",
+    menuPrice: "",
+    menuImageUrl: "",
+    menuCookingTime: "",
+    menuDifficulty: "",
+    menuIngredients: "",
+    menuCalories: "",
     quantity: "",
   });
 
-  // uploadImgUrl 상태 정의 및 초기화
   const [uploadImgUrl, setUploadImgurl] = useState("");
-
-  //선택한 재료들
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
 
-  // 입력 변경 시 호출되는 함수
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    console.log("가게의 아이디" + name, value);
   };
 
-  // 이미지 업로드 시 호출되는 함수
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -84,31 +73,25 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
         }
       );
 
-      const menu_image_url = response.data.data.url;
-      setFormData((prev) => ({ ...prev, menu_image_url }));
-      setUploadImgurl(menu_image_url);
+      const menuImageUrl = response.data.data.url;
+      setFormData((prev) => ({ ...prev, menuImageUrl }));
+      setUploadImgurl(menuImageUrl);
     } catch (error) {
       console.error("Image upload error:", error);
     }
   };
 
-  // 폼 제출 시 호출되는 함수
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const submissionData = {
       ...formData,
-      menu_ingredients: selectedIngredients.join(", "),
+      menuIngredients: selectedIngredients.join(", "),
     };
     onSubmit(submissionData);
   };
 
-  // 재료 선택 시 호출되는 함수
   const handleIngredientsChange = (newIngredients: string[]) => {
     setSelectedIngredients(newIngredients);
-    setFormData((prev) => ({
-      ...prev,
-      menu_ingredients: newIngredients.join(", "),
-    }));
   };
 
   return (
@@ -131,72 +114,72 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
       >
         <div>
           <label
-            htmlFor="store_id"
+            htmlFor="storeId"
             className="block text-sm font-medium text-gray-700"
           >
             가게 선택
           </label>
           <select
-            id="store_id"
-            value={formData.store_id}
+            id="storeId"
+            value={formData.storeId}
             onChange={handleChange}
-            name="store_id"
+            name="storeId"
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           >
             <option value="" disabled>
               가게 선택
             </option>
             {stores.map((store) => (
-              <option key={store.store_id} value={store.store_id}>
-                {store.store_name}
+              <option key={store.storeId} value={store.storeId}>
+                {store.storeName}
               </option>
             ))}
           </select>
         </div>
         <div>
           <label
-            htmlFor="menu_name"
+            htmlFor="menuName"
             className="block text-sm font-medium text-gray-700"
           >
             메뉴 이름
           </label>
           <input
-            id="menu_menuName"
-            value={formData.menu_name}
+            id="menuName"
+            value={formData.menuName}
             onChange={handleChange}
-            name="menu_name"
+            name="menuName"
             placeholder="메뉴 이름"
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           />
         </div>
         <div>
           <label
-            htmlFor="menu_description"
+            htmlFor="menuDescription"
             className="block text-sm font-medium text-gray-700"
           >
             설명
           </label>
           <input
-            id="menu_description"
-            value={formData.menu_description}
+            id="menuDescription"
+            value={formData.menuDescription}
             onChange={handleChange}
-            name="menu_description"
+            name="menuDescription"
             placeholder="설명"
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           />
         </div>
         <div>
           <label
-            htmlFor="menu_price"
+            htmlFor="menuPrice"
             className="block text-sm font-medium text-gray-700"
           >
             가격
           </label>
           <input
-            id="menu_price"
-            value={formData.menu_price}
+            id="menuPrice"
+            value={formData.menuPrice}
             onChange={handleChange}
-            name="menu_price"
+            name="menuPrice"
             type="number"
             placeholder="가격"
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md appearance-none"
@@ -204,15 +187,15 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
         </div>
         <div>
           <label
-            htmlFor="menu_imageUrl"
+            htmlFor="menuImageUrl"
             className="block text-sm font-medium text-gray-700"
           >
             이미지 업로드
           </label>
           <input
-            id="menu_imageUrl"
+            id="menuImageUrl"
             type="file"
-            name="menu_imageUrl"
+            name="menuImageUrl"
             onChange={handleImageUpload}
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           />
@@ -226,16 +209,16 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
         </div>
         <div>
           <label
-            htmlFor="menu_cooking_time"
+            htmlFor="menuCookingTime"
             className="block text-sm font-medium text-gray-700"
           >
             조리 시간 (분)
           </label>
           <input
-            id="menu_cooking_time"
-            value={formData.menu_cooking_time}
+            id="menuCookingTime"
+            value={formData.menuCookingTime}
             onChange={handleChange}
-            name="menu_cooking_time"
+            name="menuCookingTime"
             type="number"
             placeholder="조리 시간 (분)"
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md appearance-none"
@@ -243,16 +226,16 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
         </div>
         <div>
           <label
-            htmlFor="menu_difficulty"
+            htmlFor="menuDifficulty"
             className="block text-sm font-medium text-gray-700"
           >
             난이도
           </label>
           <select
-            id="menu_difficulty"
-            value={formData.menu_difficulty}
+            id="menuDifficulty"
+            value={formData.menuDifficulty}
             onChange={handleChange}
-            name="menu_difficulty"
+            name="menuDifficulty"
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           >
             <option value="" disabled>
@@ -263,7 +246,6 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             <option value="Hard">어려움</option>
           </select>
         </div>
-
         <div>
           <label
             htmlFor="ingredients"
@@ -276,19 +258,18 @@ const MenuRegistrationForm: React.FC<MenuRegistrationFormProps> = ({
             onChange={handleIngredientsChange}
           />
         </div>
-
         <div>
           <label
-            htmlFor="calories"
+            htmlFor="menuCalories"
             className="block text-sm font-medium text-gray-700"
           >
             칼로리
           </label>
           <input
-            id="calories"
-            value={formData.menu_calories}
+            id="menuCalories"
+            value={formData.menuCalories}
             onChange={handleChange}
-            name="menu_calories"
+            name="menuCalories"
             type="number"
             placeholder="칼로리"
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md appearance-none"

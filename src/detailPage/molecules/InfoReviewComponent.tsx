@@ -8,23 +8,23 @@ import InfoSetStar from "../atom/InfoSetStar";
 export type InfoReviewComponentProps = {
   userName: string;
   comment: string;
-  review_rating: number;
+  reviewRating: number;
   reviewDate: string;
-  member_idx?: number;
-  review_id: number;
+  memberIdx?: number;
+  reviewId: number;
 };
 const InfoReviewComponent = ({
   userName,
   comment,
-  review_rating,
+  reviewRating,
   reviewDate,
-  review_id,
+  reviewId,
 }: InfoReviewComponentProps) => {
   return (
-    <div className="flex flex-col gap-1" key={review_id}>
+    <div className="flex flex-col gap-1" key={reviewId}>
       <div className="text-bold">{userName}</div>
       <div className="flex gap-1">
-        <InfoSetStar starNum={review_rating} />
+        <InfoSetStar starNum={reviewRating} />
         <span>{reviewDate}</span>
       </div>
       <InfoMenuText content={comment} />

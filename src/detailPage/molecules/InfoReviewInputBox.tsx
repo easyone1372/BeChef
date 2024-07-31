@@ -1,13 +1,12 @@
-import userEvent from "@testing-library/user-event";
+import React, { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import InfoReviewInput from "../atom/InfoReviewInput";
 import InfoSubmitBtn from "../atom/InfoSubmitBtn";
-import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
 import InfoReviewStarComponent from "./InfoReviewStarComponent";
 import { InfoReviewComponentProps } from "./InfoReviewComponent";
-import InfoReviewList from "./InfoReviewList";
+import { log } from "console";
 
-//상세 페이지 리뷰 작성 전체 박스
 type InfoReviewInputBoxProps = {
   store_id: number;
   member_idx: number | null;
@@ -16,44 +15,100 @@ type InfoReviewInputBoxProps = {
   >;
   fetchAverageRating: () => void;
 };
+
+type ReviewResponse = {
+  id: number;
+  member_idx: number;
+  store_id: number;
+  comment: string;
+  review_rating: number;
+};
+
 const InfoReviewInputBox = ({
   store_id,
-  member_idx,
   setInfoReviewList,
   fetchAverageRating,
 }: InfoReviewInputBoxProps) => {
   const [comment, setComment] = useState("");
-  const [reviewRating, setReviewRating] = useState<number>(0); // 리뷰 평점을 추가로 설정해야 함
-  const [reviewSubmitted, setReviewSubmitted] = useState<boolean>(false); // 리뷰 제출 상태 추가
+  const [reviewRating, setReviewRating] = useState<number>(0);
+  const [reviewSubmitted, setReviewSubmitted] = useState<boolean>(false);
   const [resetInput, setResetInput] = useState<boolean>(false);
+  const [member_idx, setMember_idx] = useState<number | null>(null);
+  const [token, setToken] = useState<any>(null);
 
-  //리뷰 정보 가져와서 화면에 출력하는 함수
+  const getToken = () => {
+    return localStorage.getItem("jwt-token");
+  };
+
+  const isTokenValid = () => {
+    const token = getToken();
+    return !!token;
+  };
+
+  useEffect(() => {
+    const token = getToken();
+
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        setMember_idx(decodedToken.idx);
+        setToken(decodedToken);
+      } catch (error) {
+        console.error("토큰 디코딩 중 오류 발생:", error);
+      }
+    }
+  }, []);
+
   const fetchReviewList = useCallback(async () => {
     try {
-      const url = `http://localhost:3001/api/info_review/${store_id}`;
-      const response = await axios.get(url);
-      const data: InfoReviewComponentProps[] = response.data.reverse();
+      const token = getToken();
+      const url = `http://localhost:8080/api/info/info_review/${store_id}`;
+      const response = await axios.get<InfoReviewComponentProps[]>(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = response.data.reverse();
+      console.log("리뷰데이터" + data);
+
       setInfoReviewList(data);
     } catch (error) {
       console.error("리뷰 정보를 가져오는 중 오류 발생: ", error);
     }
   }, [store_id, setInfoReviewList]);
 
-  //리뷰가 등록,수정,삭제 될 때마다 평균내어 db로 보내는 함수
   const updateStoreRating = useCallback(async () => {
     try {
+      const token = getToken();
+      console.log("update Star data:", {
+        memberIdx: member_idx,
+        storeId: store_id,
+        comment: comment,
+        reviewRating: reviewRating,
+      });
       await axios.post(
-        `http://localhost:3001/api/update_store_rating/${store_id}`
+        `http://localhost:8080/api/info/update_store_rating/${store_id}`,
+        {
+          reviewRating: reviewRating,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
     } catch (error) {
       console.error("별점 평균 업데이트 중 오류 발생: ", error);
     }
-  }, [store_id]);
+  }, [store_id, comment, reviewRating, member_idx]);
 
-  //등록 버튼을 누르면 작동하는 함수
   const handleSubmit = async () => {
     if (!member_idx) {
       alert("로그인이 필요합니다.");
+      return;
+    }
+
+    if (!isTokenValid()) {
+      alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+      // 여기에 로그아웃 처리 로직 추가
+      // 예: logout();
       return;
     }
 
@@ -63,27 +118,55 @@ const InfoReviewInputBox = ({
     }
 
     try {
-      await axios.post(`http://localhost:3001/api/review_input`, {
-        member_idx,
-        store_id,
-        comment,
-        review_rating: reviewRating,
+      const token = getToken();
+      if (!token) {
+        throw new Error("토큰이 없습니다.");
+      }
+      const decodedToken = jwtDecode(token);
+      console.log("Sending review data:", {
+        token: decodedToken,
+        memberIdx: member_idx,
+        storeId: store_id,
+        comment: comment,
+        reviewRating: reviewRating,
       });
-      console.log("리뷰가 성공적으로 제출되었습니다.");
-      setComment(""); // 입력 필드 초기화
-      setResetInput(true);
-      setReviewSubmitted(true); // 제출 상태 업데이트
+      const response = await axios.post<ReviewResponse>(
+        `http://localhost:8080/api/info/review_input`,
+        {
+          memberIdx: member_idx,
+          storeId: store_id,
+          comment: comment,
+          reviewRating: reviewRating,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("리뷰가 성공적으로 제출되었습니다.", response.data);
 
-      // 리뷰 목록 갱신
-      await fetchReviewList(); //리뷰 리스트 다시 출력
-      await updateStoreRating(); //평균 점수 계산 후 db로 데이터 보냄
-      fetchAverageRating(); //별점 갱신 함수 호출
+      // 여기서 알림을 표시합니다
+      alert("리뷰가 성공적으로 등록되었습니다.");
+
+      setComment("");
+      setResetInput(true);
+      setReviewSubmitted(true);
+
+      await fetchReviewList();
+      await updateStoreRating();
+      fetchAverageRating();
     } catch (error) {
       console.error("리뷰 제출 중 오류 발생:", error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          alert("인증에 실패했습니다. 다시 로그인해주세요.");
+        } else {
+          alert("리뷰 제출 중 오류가 발생했습니다. 다시 시도해주세요.");
+        }
+      } else {
+        alert("알 수 없는 오류가 발생했습니다.");
+      }
     }
   };
-
-  //별점 및 입력필드 초기화
   useEffect(() => {
     if (reviewSubmitted) {
       setReviewRating(0);
@@ -93,7 +176,6 @@ const InfoReviewInputBox = ({
     }
   }, [reviewSubmitted]);
 
-  //나중에 리팩토링 가능할거같음
   return (
     <div>
       <InfoReviewStarComponent
@@ -115,4 +197,5 @@ const InfoReviewInputBox = ({
     </div>
   );
 };
+
 export default InfoReviewInputBox;

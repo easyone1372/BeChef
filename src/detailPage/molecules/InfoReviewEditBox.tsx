@@ -5,7 +5,7 @@ import InfoReviewBox from "./InfoReviewBox";
 import InfoReviewEdit from "./InfoReviewEdit";
 
 type InfoReviewEditBoxProps = {
-  review_id: number;
+  reviewId: number;
   comment: string;
   rating: number;
   onDelete: (review_id: number) => void; // 삭제 함수 전달
@@ -14,7 +14,7 @@ type InfoReviewEditBoxProps = {
 
 //상세 페이지 - 리뷰 수정/삭제 기능 버튼 컴포넌트
 const InfoReviewEditBox = ({
-  review_id,
+  reviewId,
   comment,
   rating,
   onDelete,
@@ -28,7 +28,7 @@ const InfoReviewEditBox = ({
 
   const handleDeleteBtn = async () => {
     if (window.confirm("정말로 이 리뷰를 삭제하시겠습니까?")) {
-      onDelete(review_id);
+      onDelete(reviewId);
     }
   };
   const handleCancelEdit = () => {
@@ -38,7 +38,7 @@ const InfoReviewEditBox = ({
     <div className="flex gap-2">
       {isEditing ? (
         <InfoReviewEdit
-          review_id={review_id}
+          review_id={reviewId}
           currentComment={comment}
           currentRating={rating}
           onEditSubmit={(id: number, content: string, rating: number) => {
