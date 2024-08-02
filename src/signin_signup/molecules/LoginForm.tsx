@@ -6,6 +6,7 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { jwtDecode } from "jwt-decode";
+import { LOGIN_POST } from "../../Urls/URLList";
 
 const LoginForm = () => {
   const [id, setId] = useState("");
@@ -23,7 +24,8 @@ const LoginForm = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:8080/bechef/member/login",
+        // "http://localhost:8080/bechef/member/login"
+        LOGIN_POST(),
         { id, pwd }
       );
       const apiResponse = response.data;

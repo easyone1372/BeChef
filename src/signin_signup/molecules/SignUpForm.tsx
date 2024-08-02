@@ -15,6 +15,7 @@ import FormField from "./FormField";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse } from "@fortawesome/free-solid-svg-icons";
+import { REGISTER_POST } from "../../Urls/URLList";
 
 const SignUpForm: React.FC = () => {
   // 각 입력 필드에 대한 상태 관리
@@ -109,17 +110,14 @@ const SignUpForm: React.FC = () => {
     if (!hasErrors) {
       try {
         // 서버에 회원가입 요청
-        const response = await axios.post(
-          "http://localhost:8080/bechef/member/register",
-          {
-            name,
-            id,
-            pwd,
-            email,
-            phone,
-            address,
-          }
-        );
+        const response = await axios.post(REGISTER_POST(), {
+          name,
+          id,
+          pwd,
+          email,
+          phone,
+          address,
+        });
         console.log("서버 응답:", response.data);
         alert("가입 성공!");
         goToLogin();
