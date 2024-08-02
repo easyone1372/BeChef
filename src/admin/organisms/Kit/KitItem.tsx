@@ -3,6 +3,7 @@ import KitInfo from "../../molecules/Kit/KitInfo";
 import { Kit } from "../../atom/Kit/Kit";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { ADMIN_UPDATE_QUANTITY } from "../../../Urls/URLList";
 
 type KitItemProps = {
   kit: Kit;
@@ -37,12 +38,13 @@ const KitItem: React.FC<KitItemProps> = ({ kit, onUpdate }) => {
       alert("관리자만 수량을 업데이트할 수 있습니다.");
       return;
     }
-  
+
     try {
       setIsUpdating(true);
       const token = localStorage.getItem("jwt-token");
-      const response = await axios.put( 
-        `http://localhost:8080/api/admin/inventory/${kit.store_id}/${kit.menu_id}`,
+      const response = await axios.put(
+        //`http://localhost:8080/api/admin/inventory/${kit.store_id}/${kit.menu_id}`
+        ADMIN_UPDATE_QUANTITY(kit),
         {
           quantity: inputQuantity,
         },
@@ -51,7 +53,7 @@ const KitItem: React.FC<KitItemProps> = ({ kit, onUpdate }) => {
         }
       );
       const updatedKit = response.data;
-      onUpdate({...kit, quantity: updatedKit.quantity});
+      onUpdate({ ...kit, quantity: updatedKit.quantity });
       alert("수량이 성공적으로 업데이트되었습니다.");
     } catch (error) {
       console.error("Error updating kit quantity:", error);

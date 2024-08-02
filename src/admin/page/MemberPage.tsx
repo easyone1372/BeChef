@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import Navigation from "../organisms/Navigation/NavigationPage";
 import Sidebar from "../organisms/Sidebar/SidebarPage";
 import MemberTable from "../organisms/Member/MemberTable";
+import { ADMIN_MEMBERS, ADMIN_MEMBERS_DELETE } from "../../Urls/URLList";
 
 export type Member = {
   member_idx: number;
@@ -60,14 +61,11 @@ const MemberPage = () => {
         return;
       }
 
-      const response = await axios.get<Member[]>(
-        "http://localhost:8080/api/admin/members",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get<Member[]>(ADMIN_MEMBERS(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       console.log("멤버 데이터:", response.data);
       setMembers(response.data);
@@ -93,14 +91,11 @@ const MemberPage = () => {
     if (window.confirm("정말로 이 회원을 삭제하시겠습니까?")) {
       try {
         const token = localStorage.getItem("jwt-token");
-        await axios.delete(
-          `http://localhost:8080/api/admin/members/${member_idx}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await axios.delete(ADMIN_MEMBERS_DELETE(member_idx), {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setMembers((prevMembers) =>
           prevMembers.filter((member) => member.member_idx !== member_idx)
         );

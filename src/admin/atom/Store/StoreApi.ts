@@ -1,10 +1,9 @@
 import axios from "axios";
 import { Store } from "./Store";
-
-const API_URL = "http://localhost:8080/api";
+import { ADMIN_STORE } from "../../../Urls/URLList";
 
 const fetchStores = async (): Promise<Store[]> => {
-  const response = await axios.get<Store[]>(`${API_URL}/stores`);
+  const response = await axios.get<Store[]>(ADMIN_STORE());
   return response.data;
 };
 

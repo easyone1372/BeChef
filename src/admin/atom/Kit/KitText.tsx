@@ -5,8 +5,8 @@ type TextProps = {
   className?: string;
 };
 
-const Text = ({ content, className }: TextProps) => (
+const KitText = ({ content, className }: TextProps) => (
   <p className={className}>{content}</p>
 );
 
-export default Text;
+export default KitText;

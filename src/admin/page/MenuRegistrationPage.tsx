@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import Navigation from "../organisms/Navigation/NavigationPage";
 import Sidebar from "../organisms/Sidebar/SidebarPage";
 import MenuRegistrationForm from "../organisms/MenuRegistration/MenuRegistrationForm";
+import { ADMIN_LOAD_STORES, ADMIN_MENU_POST } from "../../Urls/URLList";
 
 export type Store = {
   storeId: number;
@@ -57,12 +58,9 @@ const MenuRegistrationPage: React.FC = () => {
   const loadStores = async () => {
     try {
       const token = localStorage.getItem("jwt-token");
-      const response = await axios.get(
-        "http://localhost:8080/api/admin/stores",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.get(ADMIN_LOAD_STORES(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       console.log("가게들 불러옴:", response.data);
       setStores(response.data);
     } catch (error) {
@@ -99,7 +97,7 @@ const MenuRegistrationPage: React.FC = () => {
       );
 
       const response = await axios.post(
-        "http://localhost:8080/api/admin/menu",
+        ADMIN_MENU_POST(),
         {
           ...formData,
           storeId: Number(formData.storeId),

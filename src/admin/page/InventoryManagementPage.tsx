@@ -7,6 +7,7 @@ import { Kit } from "../atom/Kit/Kit";
 import { jwtDecode } from "jwt-decode";
 import { log } from "console";
 import { json } from "stream/consumers";
+import { ADMIN_LOAD_STORES, ADMIN_STORE_SELECTED } from "../../Urls/URLList";
 
 const InventoryManagementPage = () => {
   const [kits, setKits] = useState<Kit[]>([]);
@@ -34,12 +35,9 @@ const InventoryManagementPage = () => {
       const loadStores = async () => {
         try {
           const token = localStorage.getItem("jwt-token");
-          const response = await axios.get(
-            "http://localhost:8080/api/admin/stores",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
+          const response = await axios.get(ADMIN_LOAD_STORES(), {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           const fetchedStores = response.data;
           setStores(fetchedStores);
           if (fetchedStores.length > 0) {
@@ -62,7 +60,7 @@ const InventoryManagementPage = () => {
         try {
           const token = localStorage.getItem("jwt-token");
           const response = await axios.get(
-            `http://localhost:8080/api/admin/inventory/${selectedStoreId}`,
+            ADMIN_STORE_SELECTED(selectedStoreId),
             {
               headers: { Authorization: `Bearer ${token}` },
             }

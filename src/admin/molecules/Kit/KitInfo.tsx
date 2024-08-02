@@ -1,7 +1,7 @@
 // src/molecules/Kit/KitInfo.tsx
 
 import React from "react";
-import Text from "../../atom/Kit/KitText";
+import KitText from "../../atom/Kit/KitText";
 
 type KitInfoProps = {
   name: string;
@@ -12,13 +12,13 @@ type KitInfoProps = {
 
 const KitInfo = ({ name, description, price, quantity }: KitInfoProps) => (
   <div className="p-4">
-    <Text content={name} className="text-xl font-semibold mb-2" />
-    <Text content={description} className="text-gray-600 mb-2" />
-    <Text
+    <KitText content={name} className="text-xl font-semibold mb-2" />
+    <KitText content={description} className="text-gray-600 mb-2" />
+    <KitText
       content={`가격: ${price.toLocaleString()}원`}
       className="text-gray-600 mb-2"
     />
-    <Text content={`수량: ${quantity}`} className="text-gray-600" />
+    <KitText content={`수량: ${quantity}`} className="text-gray-600" />
   </div>
 );
 

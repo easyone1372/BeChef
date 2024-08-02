@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import axios from "axios";
 import HeaderSection from "../../molecules/HeaderSection/HeaderSection";
 import SearchSection from "../../molecules/SearchSection/SearchSection";
 import SearchResults, { Store } from "../../atom/SearchResults/SearchResults";
 import SortBtn from "../../molecules/sortBtn/SortBtn";
+import { MAP_SEARCH } from "../../../Urls/URLList";
 
 interface SearchProps {
   setResults: React.Dispatch<React.SetStateAction<Store[]>>;
@@ -14,12 +15,11 @@ const Search = ({ setResults, onMarkerHover }: SearchProps) => {
   const [query, setQuery] = useState("");
   const [results, setResultsState] = useState<Store[]>([]);
   const [sortOption, setSortOption] = useState<string>("");
+  const resultsContainerRef = useRef<HTMLUListElement>(null); //0802 추가
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get<Store[]>(
-        `http://localhost:8080/bechef/search?query=${query}`
-      );
+      const response = await axios.get<Store[]>(MAP_SEARCH(query));
       setResultsState(response.data);
       setResults(response.data);
     } catch (error) {
@@ -41,6 +41,11 @@ const Search = ({ setResults, onMarkerHover }: SearchProps) => {
       sortedResults.sort((a, b) => b.store_rating - a.store_rating);
     }
     setResultsState(sortedResults);
+
+    //0802 수정
+    if (resultsContainerRef.current) {
+      resultsContainerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   return (
@@ -54,7 +59,11 @@ const Search = ({ setResults, onMarkerHover }: SearchProps) => {
           handleKeyPress={handleKeyPress}
         />
         <SortBtn setSortOption={handleSort} />
-        <SearchResults results={results} onMarkerHover={onMarkerHover} />
+        <SearchResults
+          results={results}
+          onMarkerHover={onMarkerHover}
+          ref={resultsContainerRef}
+        />
       </div>
     </div>
   );

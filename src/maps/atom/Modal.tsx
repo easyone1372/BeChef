@@ -2,6 +2,11 @@ import React, { useEffect, useState } from "react";
 import Button from "./Button/Button";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import {
+  MAP_DELETE_ACCOUNT,
+  MAP_MODAL_FAVORITE,
+  MAP_MODAL_REVIEW,
+} from "../../Urls/URLList";
 
 type ModalProps = {
   showModal: boolean;
@@ -44,21 +49,15 @@ const Modal = ({ showModal, closeModal, onLogout }: ModalProps) => {
 
       console.log("Decoded memberIdx:", idx); // 디버깅을 위해 콘솔에 출력
 
-      const favoritesResponse = await axios.get(
-        `http://localhost:8080/api/favorites?memberIdx=${idx}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const favoritesResponse = await axios.get(MAP_MODAL_FAVORITE(idx), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setFavorites(favoritesResponse.data);
 
       // review 불러오기
-      const reviewsResponse = await axios.get(
-        `http://localhost:8080/api/reviews?memberIdx=${idx}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const reviewsResponse = await axios.get(MAP_MODAL_REVIEW(idx), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setReviews(reviewsResponse.data);
     } catch (error) {
       console.error("데이터 불러오기 실패", error);
@@ -70,6 +69,10 @@ const Modal = ({ showModal, closeModal, onLogout }: ModalProps) => {
     const confirmed = window.confirm("정말로 회원 탈퇴를 하시겠습니까?");
     if (!confirmed) return;
 
+    
+      // 여기서 데이터 담아서 보내줘야함
+
+
     try {
       const token = localStorage.getItem("jwt-token");
       if (!token) {
@@ -78,14 +81,11 @@ const Modal = ({ showModal, closeModal, onLogout }: ModalProps) => {
 
       console.log("JWT Token for account deletion:", token);
 
-      const response = await axios.delete(
-        "http://localhost:8080/bechef/member",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.delete(MAP_DELETE_ACCOUNT(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.status === 200) {
         console.log("Account Deleted");
